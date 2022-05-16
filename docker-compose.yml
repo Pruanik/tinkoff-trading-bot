@@ -3,7 +3,7 @@ version: "3.3"
 services:
   webapplication:
     env_file: .env
-    container_name: web-application
+    container_name: webapplication
     build:
       context: .
       dockerfile: build/package/webapplication/Dockerfile
@@ -15,7 +15,7 @@ services:
       - mysql
 
   mysql:
-    image: mysql:8.0
+    image: mysql:8.0-oracle
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 1
@@ -29,16 +29,16 @@ services:
     networks:
       - ttb_net
 
-  migrator:
-    env_file: .env
-    container_name: migrator
-    build:
-      context: .
-      dockerfile: build/package/migrator/Dockerfile
-    volumes:
-      - ./migrations:/migrations
-    networks:
-      - ttb_net
+  # migrator:
+  #   env_file: .env
+  #   container_name: migrator
+  #   build:
+  #     context: .
+  #     dockerfile: build/package/migrator/Dockerfile
+  #   volumes:
+  #     - ./migrations:/migrations
+  #   networks:
+  #     - ttb_net
 networks:
   ttb_net:
     driver: bridge
