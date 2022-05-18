@@ -12,33 +12,31 @@ services:
     networks:
       - ttb_net
     depends_on:
-      - mysql
+      - postgresql
 
-  mysql:
-    image: mysql:8.0-oracle
-    command: --default-authentication-plugin=mysql_native_password
+  postgresql:
+    image: postgres:14.3-alpine
     environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: 1
-      MYSQL_DATABASE: "${DATABASE_NAME}"
-      MYSQL_USER: "${DATABASE_USER}"
-      MYSQL_PASSWORD: "${DATABASE_PASSWORD}"
+      POSTGRES_DB: $DATABASE_NAME
+      POSTGRES_USER: $DATABASE_USER
+      POSTGRES_PASSWORD: $DATABASE_PASSWORD
     ports:
-      - "${DATABASE_HOST_PORT:-3306}:3306"
-    volumes:
-      - ./data/mysql:/var/lib/mysql
+      - "${DATABASE_HOST_PORT:-5432}:${DATABASE_PORT:-5432}"
     networks:
       - ttb_net
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql/data
 
-  # migrator:
-  #   env_file: .env
-  #   container_name: migrator
-  #   build:
-  #     context: .
-  #     dockerfile: build/package/migrator/Dockerfile
-  #   volumes:
-  #     - ./migrations:/migrations
-  #   networks:
-  #     - ttb_net
+  migrator:
+    env_file: .env
+    container_name: migrator
+    build:
+      context: .
+      dockerfile: build/package/migrator/Dockerfile
+    volumes:
+      - ./migrations:/migrations
+    networks:
+      - ttb_net
 networks:
   ttb_net:
     driver: bridge
