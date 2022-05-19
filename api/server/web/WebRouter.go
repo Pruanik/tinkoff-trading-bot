@@ -14,6 +14,11 @@ type WebRouter struct {
 	handler *web.HomeHandler
 }
 
-func (wr *WebRouter) AddGroup(webRouterGroup *gin.RouterGroup) {
+func (wr *WebRouter) Create(router *gin.Engine) {
+	router.LoadHTMLGlob("./web/dist/*.html")
+	router.Static("/assets", "./web/dist/assets")
+	router.Static("/static", "./web/static")
+
+	webRouterGroup := router.Group("/")
 	webRouterGroup.GET("/", wr.handler.Handle)
 }

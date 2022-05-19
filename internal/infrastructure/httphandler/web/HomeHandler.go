@@ -1,6 +1,10 @@
 package web
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
 
 func NewHomeHandler() *HomeHandler {
 	handler := HomeHandler{}
@@ -10,5 +14,9 @@ func NewHomeHandler() *HomeHandler {
 type HomeHandler struct{}
 
 func (hh *HomeHandler) Handle(ctx *gin.Context) {
-	//handler.ServeHTTP(ctx.Writer, ctx.Request)
+	ctx.HTML(
+		http.StatusOK,
+		"index.html",
+		"",
+	)
 }

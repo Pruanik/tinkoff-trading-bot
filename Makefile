@@ -10,6 +10,9 @@ build-webapp:
 build-migrator:
 	@sh -c "'$(CURDIR)/scripts/build.sh' migrator"
 
+build-frontend:
+	@sh -c "'$(CURDIR)/scripts/build.sh' frontend"
+
 up:
 	docker-compose up -d
 
@@ -21,3 +24,12 @@ migration-up:
 
 migration-down:
 	docker-compose run --rm --entrypoint "" migrator make migration-down
+
+frontend-init:
+	docker-compose run --rm --entrypoint "" frontend make front-install
+
+frontend-build:
+	docker-compose run --rm --entrypoint "" frontend make front-build
+
+frontend-dev:
+	docker-compose run --rm --entrypoint "" frontend make front-watch

@@ -8,10 +8,9 @@ func NewApiRouter() *ApiRouter {
 }
 
 type ApiRouter struct {
-	connection string
 	//handler *api.HomeHandler
 }
 
-func (ar *ApiRouter) AddGroup(apiRouterGroup *gin.RouterGroup) {
+func (ar *ApiRouter) Create(router *gin.Engine) {
 	//apiRouterGroup.GET("/", ar.handler.handle)
 }

@@ -9,10 +9,21 @@ services:
       dockerfile: build/package/webapplication/Dockerfile
     ports:
       - "${WEB_APPLICATION_HOST_PORT:-80}:${WEB_APPLICATION_PORT:-80}"
+    volumes:
+      - ./web/dist:/app/web/dist:delegated
+      - ./web/static:/app/web/static:delegated
     networks:
       - ttb_net
     depends_on:
       - postgresql
+  
+  frontend:
+    build:
+      context: .
+      dockerfile: build/package/frontend/Dockerfile
+    tty: true
+    volumes:
+      - ./web:/usr/src/app:delegated
 
   postgresql:
     image: postgres:14.3-alpine

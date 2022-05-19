@@ -25,9 +25,6 @@ func NewServer(router *gin.Engine, config *configs.Config) *http.Server {
 }
 
 func RegisterRoutes(router *gin.Engine, webRouter *web.WebRouter, apiRouter *api.ApiRouter) {
-	webRouterGroup := router.Group("/")
-	webRouter.AddGroup(webRouterGroup)
-
-	apiRouterGroup := router.Group("/api/")
-	apiRouter.AddGroup(apiRouterGroup)
+	webRouter.Create(router)
+	apiRouter.Create(router)
 }
