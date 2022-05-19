@@ -10,7 +10,7 @@ RUN go mod download
 RUN go build -o /tmp/app/out/webapplication /tmp/app/src/cmd/webapplication/main.go
 
 #Create VueJs frontend
-FROM node:17-alpine AS frontend
+FROM node:18.2.0-alpine AS frontend
 
 RUN apk add yarn
 WORKDIR /usr/src/app
@@ -31,8 +31,6 @@ COPY --from=build /tmp/app/out/webapplication /app/webapplication
 RUN chmod +x /app/webapplication
 
 COPY --from=frontend /usr/src/app/dist /app/web/dist
-
-COPY web/dist /app/web/dist
 COPY web/static /app/web/static
 
 COPY build/package/webapplication/entrypoint.sh /app/entrypoint.sh

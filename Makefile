@@ -25,11 +25,11 @@ migration-up:
 migration-down:
 	docker-compose run --rm --entrypoint "" migrator make migration-down
 
-frontend-init:
-	docker-compose run --rm --entrypoint "" frontend make front-install
+frontend-install:
+	docker-compose run --rm frontend yarn install
 
 frontend-build:
-	docker-compose run --rm --entrypoint "" frontend make front-build
+	docker-compose run --rm frontend yarn build
 
 frontend-dev:
-	docker-compose run --rm --entrypoint "" frontend make front-watch
+	docker-compose run --rm frontend yarn dev

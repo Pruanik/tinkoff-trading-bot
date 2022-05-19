@@ -18,6 +18,7 @@ services:
       - postgresql
   
   frontend:
+    container_name: frontend
     build:
       context: .
       dockerfile: build/package/frontend/Dockerfile
@@ -27,6 +28,7 @@ services:
 
   postgresql:
     image: postgres:14.3-alpine
+    container_name: postgresql
     environment:
       POSTGRES_DB: $DATABASE_NAME
       POSTGRES_USER: $DATABASE_USER
