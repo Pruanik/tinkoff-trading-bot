@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS trading_strategy_settings;
+drop table if exists trading_strategy_settings;

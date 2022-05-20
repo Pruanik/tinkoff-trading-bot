@@ -1,19 +1,26 @@
-CREATE TABLE IF NOT EXISTS `candles` (
-	`id` INT NOT NULL AUTO_INCREMENT,
-	`figi` VARCHAR NOT NULL,
-	`interval` INT,
-	`open` DOUBLE NOT NULL,
-	`high` DOUBLE NOT NULL,
-	`low` DOUBLE NOT NULL,
-	`close` DOUBLE NOT NULL,
-	`volume` BIGINT NOT NULL,
-	`timestamp` BIGINT NOT NULL,
-	`created_at` DATETIME NOT NULL,
-	KEY `i_candles_figi` (`figi`) USING BTREE,
-    KEY `i_candles_created_at` (`created_at`) USING BTREE,
-    KEY `i_candles_timestamp` (`timestamp`) USING BTREE,
-	PRIMARY KEY (`id`),
-    CONSTRAINT fk_candles_instruments_figi
-      FOREIGN KEY(figi) 
-	  REFERENCES instruments(figi)
+create table if not exists candles
+(
+    id         bigserial primary key,
+	figi       varchar   not null,
+	interval   integer,
+	open       decimal   not null,
+	high       decimal   not null,
+	low        decimal   not null,
+	close      decimal   not null,
+	volume     bigserial not null,
+	timestamp  timestamp not null,
+	created_at timestamp not null
 );
+
+create index if not exists i_candles_figi
+    on candles (figi);
+create index if not exists i_candles_created_at
+    on candles (created_at);
+create index if not exists i_candles_timestamp
+    on candles (timestamp);
+
+
+alter table candles 
+add constraint fk_candles_instruments_figi 
+foreign key (figi) 
+references instruments (figi);
