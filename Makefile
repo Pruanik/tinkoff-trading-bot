@@ -31,5 +31,11 @@ frontend-install:
 frontend-build:
 	docker-compose run --rm frontend yarn build
 
-frontend-dev:
-	docker-compose run --rm frontend yarn dev
+frontend-watch:
+	docker-compose run --rm frontend yarn watch
+
+run-webapp:
+	go run cmd/webapplication/main.go
+
+run-tinkoffconnection:
+	go run cmd/tinkoffinvestconnection/main.go
