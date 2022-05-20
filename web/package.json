@@ -9,9 +9,11 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "apexcharts": "^3.35.2",
     "uikit": "^3.14.1",
     "vue": "^3.2.33",
-    "vue-router": "^4.0.14"
+    "vue-router": "^4.0.14",
+    "vue3-apexcharts": "^1.4.1"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.0",

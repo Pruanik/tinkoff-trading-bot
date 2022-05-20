@@ -21,13 +21,13 @@ import { RouterLink } from "vue-router";
             <div class="uk-navbar-dropdown">
               <ul class="uk-nav uk-navbar-dropdown-nav">
                 <li>
-                  <RouterLink to="/">Дашборд</RouterLink>
+                  <RouterLink to="/">Dashboard</RouterLink>
                 </li>
                 <li>
-                  <RouterLink to="/profile">Профиль</RouterLink>
+                  <RouterLink to="/profile">Profile</RouterLink>
                 </li>
                 <li>
-                  <RouterLink to="/logs">Логи</RouterLink>
+                  <RouterLink to="/logs">Logs</RouterLink>
                 </li>
               </ul>
             </div>
