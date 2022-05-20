@@ -5,13 +5,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewWebRouter(handler *web.HomeHandler) *WebRouter {
-	router := WebRouter{handler: handler}
+func NewWebRouter(homeWebHandler *web.HomeHandler, pageNotFoundHandler *web.PageNotFoundHandler) *WebRouter {
+	router := WebRouter{
+		homeWebHandler:      homeWebHandler,
+		pageNotFoundHandler: pageNotFoundHandler,
+	}
 	return &router
 }
 
 type WebRouter struct {
-	handler *web.HomeHandler
+	homeWebHandler      *web.HomeHandler
+	pageNotFoundHandler *web.PageNotFoundHandler
 }
 
 func (wr *WebRouter) Create(router *gin.Engine) {
@@ -19,6 +23,8 @@ func (wr *WebRouter) Create(router *gin.Engine) {
 	router.Static("/assets", "./web/dist/assets")
 	router.Static("/static", "./web/static")
 
+	router.NoRoute(wr.pageNotFoundHandler.Handle)
+
 	webRouterGroup := router.Group("/")
-	webRouterGroup.GET("/", wr.handler.Handle)
+	webRouterGroup.GET("/", wr.homeWebHandler.Handle)
 }

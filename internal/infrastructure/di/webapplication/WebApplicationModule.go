@@ -26,6 +26,7 @@ func (wam WebApplicationModule) BuildOptions(config *configs.Config) fx.Option {
 			webRouter.NewWebRouter,
 			apiRouter.NewApiRouter,
 			webHandler.NewHomeHandler,
+			webHandler.NewPageNotFoundHandler,
 			apiHandler.NewLogApiHandler,
 		),
 		fx.Invoke(
