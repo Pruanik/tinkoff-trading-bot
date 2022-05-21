@@ -21,6 +21,12 @@ type Config struct {
 	WebApplicationConfig struct {
 		Port string
 	}
+	TinkoffInvestConfig struct {
+		Mod             string
+		ProductionToken string
+		SandboxToken    string
+		GrpcAddr        string
+	}
 }
 
 func NewConfig() (*Config, error) {
@@ -42,6 +48,7 @@ func (c *Config) loadConfiguration() error {
 
 	c.loadDatabaseConfiguration()
 	c.loadWebApplicationConfiguration()
+	c.loadTinkoffInvestConfiguration()
 
 	return nil
 }
@@ -68,4 +75,11 @@ func (c *Config) loadDatabaseConfiguration() {
 
 func (c *Config) loadWebApplicationConfiguration() {
 	c.WebApplicationConfig.Port = os.Getenv("WEB_APPLICATION_PORT")
+}
+
+func (c *Config) loadTinkoffInvestConfiguration() {
+	c.TinkoffInvestConfig.Mod = os.Getenv("TRADING_MOD")
+	c.TinkoffInvestConfig.ProductionToken = os.Getenv("PRODUCTION_TOKEN")
+	c.TinkoffInvestConfig.SandboxToken = os.Getenv("SANDBOX_TOKEN")
+	c.TinkoffInvestConfig.GrpcAddr = os.Getenv("TINKOFF_INVEST_URL")
 }
