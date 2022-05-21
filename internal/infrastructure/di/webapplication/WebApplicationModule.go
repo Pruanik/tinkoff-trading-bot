@@ -9,9 +9,11 @@ import (
 	apiRouter "github.com/Pruanik/tinkoff-trading-bot/api/server/api"
 	webRouter "github.com/Pruanik/tinkoff-trading-bot/api/server/web"
 	"github.com/Pruanik/tinkoff-trading-bot/configs"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/application/builder"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/di/common"
 	apiHandler "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/httphandler/api"
 	webHandler "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/httphandler/web"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/repository"
 	"go.uber.org/fx"
 )
 
@@ -28,6 +30,10 @@ func (wam WebApplicationModule) BuildOptions(config *configs.Config) fx.Option {
 			webHandler.NewHomeHandler,
 			webHandler.NewPageNotFoundHandler,
 			apiHandler.NewLogApiHandler,
+			apiHandler.NewInstrumentApiHandler,
+			repository.NewInstrumentRepository,
+			builder.NewHttpResponseBuilder,
+			builder.NewGetInstrumentsBodyBuilder,
 		),
 		fx.Invoke(
 			server.RegisterRoutes,

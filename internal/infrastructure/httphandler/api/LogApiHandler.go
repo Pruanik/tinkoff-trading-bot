@@ -2,20 +2,20 @@ package api
 
 import (
 	"net/http"
-	"time"
 
-	"github.com/Pruanik/tinkoff-trading-bot/internal/application/httpresponse/api"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/builder"
 	"github.com/gin-gonic/gin"
 )
 
-func NewLogApiHandler() *LogApiHandler {
-	handler := LogApiHandler{}
+func NewLogApiHandler(httpResponseBuilder builder.HttpResponseBuilderInterface) *LogApiHandler {
+	handler := LogApiHandler{httpResponseBuilder: httpResponseBuilder}
 	return &handler
 }
 
-type LogApiHandler struct{}
+type LogApiHandler struct {
+	httpResponseBuilder builder.HttpResponseBuilderInterface
+}
 
 func (lah LogApiHandler) Handle(ctx *gin.Context) {
-	logResponse := api.LogResponseModel{RequestId: "123", Time: time.Now()}
-	ctx.JSONP(http.StatusOK, logResponse)
+	ctx.JSONP(http.StatusOK, lah.httpResponseBuilder.BuildErrorResponse("error"))
 }

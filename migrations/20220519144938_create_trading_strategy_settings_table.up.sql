@@ -1,6 +1,6 @@
 create table if not exists trading_strategy_settings
 (
-    id                  integer   primary key,
+    id                  serial    primary key,
 	trading_strategy_id integer   not null,
 	notes 	            text,
 	parameters          jsonb     not null,

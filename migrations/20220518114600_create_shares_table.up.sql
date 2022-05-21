@@ -1,6 +1,6 @@
 create table if not exists shares
 (
-    id                        integer   primary key,
+    id                        serial    primary key,
 	figi                      varchar   not null,
 	ticker                    varchar   not null,
 	class_code                varchar   not null,

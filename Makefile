@@ -14,7 +14,7 @@ build-frontend:
 	@sh -c "'$(CURDIR)/scripts/build.sh' frontend"
 
 up:
-	docker-compose up -d
+	docker-compose up -d webapplication postgresql
 
 migration-create:
 	docker-compose run --rm --entrypoint "" migrator make migration-create $(RUN_ARGS)

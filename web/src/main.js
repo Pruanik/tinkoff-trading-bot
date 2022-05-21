@@ -5,6 +5,7 @@ import router from "./router";
 import "./../node_modules/uikit/dist/css/uikit.min.css";
 import "./../node_modules/uikit/dist/js/uikit.min.js";
 import "./../node_modules/uikit/dist/js/uikit-icons.min.js";
+import "./../node_modules/vue-select/dist/vue-select.css";
 
 const app = createApp(App);
 

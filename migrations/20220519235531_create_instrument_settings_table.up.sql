@@ -1,6 +1,6 @@
 create table if not exists instrument_settings
 (
-    id                           integer   primary key,
+    id                           serial    primary key,
     figi                         varchar   not null,
 	trading_strategy_settings_id integer   not null,
     is_data_collecting           boolean   not null default false,
