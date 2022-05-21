@@ -25,7 +25,8 @@ type Config struct {
 		Mod             string
 		ProductionToken string
 		SandboxToken    string
-		GrpcAddr        string
+		GrpcUrl         string
+		GrpcPort        string
 	}
 }
 
@@ -81,5 +82,6 @@ func (c *Config) loadTinkoffInvestConfiguration() {
 	c.TinkoffInvestConfig.Mod = os.Getenv("TRADING_MOD")
 	c.TinkoffInvestConfig.ProductionToken = os.Getenv("PRODUCTION_TOKEN")
 	c.TinkoffInvestConfig.SandboxToken = os.Getenv("SANDBOX_TOKEN")
-	c.TinkoffInvestConfig.GrpcAddr = os.Getenv("TINKOFF_INVEST_URL")
+	c.TinkoffInvestConfig.GrpcUrl = os.Getenv("TINKOFF_INVEST_URL")
+	c.TinkoffInvestConfig.GrpcPort = os.Getenv("TINKOFF_INVEST_PORT")
 }
