@@ -37,6 +37,16 @@ services:
     volumes:
       - ./data/postgresql:/var/lib/postgresql/data
 
+  tinkoffinvestconnection:
+    env_file: .env
+    build:
+      context: .
+      dockerfile: build/package/tinkoffinvestconnection/Dockerfile
+    networks:
+      - ttb_net
+    depends_on:
+      - postgresql
+
   migrator:
     env_file: .env
     build:
