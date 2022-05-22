@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"github.com/Pruanik/tinkoff-trading-bot/configs"
-	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/module/tinkoffinvestconnection"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/module/tinkoffinvestconnection/fillinginstrumentsinfo"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/module/tinkoffinvestconnection/fillinginstrumentsinfo/fillingcurrenciesinfo"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/module/tinkoffinvestconnection/fillinginstrumentsinfo/fillingsharesinfo"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/di/common"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/grpc"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/grpc/investapi"
@@ -29,8 +31,12 @@ func (tic TinkoffInvestConnectionModule) BuildOptions(config *configs.Config) fx
 			investapi.NewStopOrdersServiceClient,
 			investapi.NewUsersServiceClient,
 			tinkoffinvest.NewInstrumentService,
-			tinkoffinvestconnection.NewCheckInstrumentsData,
 			repository.NewInstrumentRepository,
+			repository.NewShareRepository,
+			repository.NewCurrencyRepository,
+			fillingcurrenciesinfo.NewFillingCurrenciesInfo,
+			fillingsharesinfo.NewFillingSharesInfo,
+			fillinginstrumentsinfo.NewFillingInstrumentsInfo,
 		),
 		fx.Invoke(
 			tic.startControllSettingsUpdate,
@@ -41,12 +47,12 @@ func (tic TinkoffInvestConnectionModule) BuildOptions(config *configs.Config) fx
 	return options
 }
 
-func (tic TinkoffInvestConnectionModule) startControllSettingsUpdate(lc fx.Lifecycle, checkInstrumentsData *tinkoffinvestconnection.CheckInstrumentsData) {
+func (tic TinkoffInvestConnectionModule) startControllSettingsUpdate(lc fx.Lifecycle, fillingInstrumentsInfo fillinginstrumentsinfo.FillingInstrumentsInfoInterface) {
 	lc.Append(
 		fx.Hook{
 			OnStart: func(ctx context.Context) error {
 				go func() {
-					checkInstrumentsData.CheckDataExistAndLoad(ctx)
+					fillingInstrumentsInfo.LoadInfo(ctx)
 				}()
 				return nil
 			},

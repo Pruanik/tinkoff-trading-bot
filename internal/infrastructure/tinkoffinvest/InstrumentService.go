@@ -24,3 +24,13 @@ func (is InstrumentService) GetBaseShares(ctx context.Context) (*investapi.Share
 
 	return shares, nil
 }
+
+func (is InstrumentService) GetBaseCurrencies(ctx context.Context) (*investapi.CurrenciesResponse, error) {
+	instrumentRequest := investapi.InstrumentsRequest{InstrumentStatus: investapi.InstrumentStatus_INSTRUMENT_STATUS_BASE}
+	currencies, err := is.client.Currencies(ctx, &instrumentRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	return currencies, nil
+}

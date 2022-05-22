@@ -8,4 +8,6 @@ import (
 
 type InstrumentServiceInterface interface {
 	GetBaseShares(ctx context.Context) (*investapi.SharesResponse, error)
+
+	GetBaseCurrencies(ctx context.Context) (*investapi.CurrenciesResponse, error)
 }
