@@ -13,12 +13,11 @@ func NewInstrumentApiHandler(
 	instrumentRepository repository.InstrumentRepositoryInterface,
 	getInstrumentsBodyBuilder builder.GetInstrumentsBodyBuilderInterface,
 ) *InstrumentApiHandler {
-	handler := InstrumentApiHandler{
+	return &InstrumentApiHandler{
 		httpResponseBuilder:       httpResponseBuilder,
 		instrumentRepository:      instrumentRepository,
 		getInstrumentsBodyBuilder: getInstrumentsBodyBuilder,
 	}
-	return &handler
 }
 
 type InstrumentApiHandler struct {

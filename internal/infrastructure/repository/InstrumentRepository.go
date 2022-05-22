@@ -47,3 +47,13 @@ func (ir *InstrumentRepository) GetInstrumentsByType(ctx context.Context, instru
 
 	return instruments, nil
 }
+
+func (ir *InstrumentRepository) AreInstrumentsExistByType(ctx context.Context, instrumentType string) (bool, error) {
+	var instruments []model.Instrument
+	err := ir.db.GetConnection().Model(&model.Instrument{}).Where("type = ?", instrumentType).Limit(1).Find(&instruments).Error
+	if err != nil {
+		return false, errors.New("areInstrumentsExistByType: " + err.Error())
+	}
+
+	return len(instruments) > 0, nil
+}

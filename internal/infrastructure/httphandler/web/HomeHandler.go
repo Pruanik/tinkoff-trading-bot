@@ -7,8 +7,7 @@ import (
 )
 
 func NewHomeHandler() *HomeHandler {
-	handler := HomeHandler{}
-	return &handler
+	return &HomeHandler{}
 }
 
 type HomeHandler struct{}

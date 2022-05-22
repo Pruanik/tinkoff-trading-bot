@@ -2,12 +2,14 @@ package tinkoffinvestconnection
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Pruanik/tinkoff-trading-bot/configs"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/module/tinkoffinvestconnection"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/di/common"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/grpc"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/grpc/investapi"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/repository"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/tinkoffinvest"
 	"go.uber.org/fx"
 )
 
@@ -26,8 +28,12 @@ func (tic TinkoffInvestConnectionModule) BuildOptions(config *configs.Config) fx
 			investapi.NewSandboxServiceClient,
 			investapi.NewStopOrdersServiceClient,
 			investapi.NewUsersServiceClient,
+			tinkoffinvest.NewInstrumentService,
+			tinkoffinvestconnection.NewCheckInstrumentsData,
+			repository.NewInstrumentRepository,
 		),
 		fx.Invoke(
+			tic.startControllSettingsUpdate,
 			tic.startCollectMarketdata,
 		),
 	)
@@ -35,17 +41,25 @@ func (tic TinkoffInvestConnectionModule) BuildOptions(config *configs.Config) fx
 	return options
 }
 
+func (tic TinkoffInvestConnectionModule) startControllSettingsUpdate(lc fx.Lifecycle, checkInstrumentsData *tinkoffinvestconnection.CheckInstrumentsData) {
+	lc.Append(
+		fx.Hook{
+			OnStart: func(ctx context.Context) error {
+				go func() {
+					checkInstrumentsData.CheckDataExistAndLoad(ctx)
+				}()
+				return nil
+			},
+		},
+	)
+}
+
 func (tic TinkoffInvestConnectionModule) startCollectMarketdata(lc fx.Lifecycle, instrument investapi.InstrumentsServiceClient) {
 	lc.Append(
 		fx.Hook{
 			OnStart: func(ctx context.Context) error {
 				go func() {
-					instrumentRequest := investapi.InstrumentsRequest{InstrumentStatus: investapi.InstrumentStatus_INSTRUMENT_STATUS_BASE}
-					shares, err := instrument.Shares(ctx, &instrumentRequest)
-					if err != nil {
-						fmt.Printf("HTTP Server has error while it try to start! Error: %s", err)
-					}
-					fmt.Println(shares)
+
 				}()
 				return nil
 			},

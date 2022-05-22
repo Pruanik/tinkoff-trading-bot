@@ -10,4 +10,6 @@ type InstrumentRepositoryInterface interface {
 	GetInstruments(ctx context.Context) ([]model.Instrument, error)
 
 	GetInstrumentsByType(ctx context.Context, instrumentType string) ([]model.Instrument, error)
+
+	AreInstrumentsExistByType(ctx context.Context, instrumentType string) (bool, error)
 }

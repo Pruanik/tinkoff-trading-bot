@@ -8,8 +8,7 @@ import (
 )
 
 func NewLogApiHandler(httpResponseBuilder builder.HttpResponseBuilderInterface) *LogApiHandler {
-	handler := LogApiHandler{httpResponseBuilder: httpResponseBuilder}
-	return &handler
+	return &LogApiHandler{httpResponseBuilder: httpResponseBuilder}
 }
 
 type LogApiHandler struct {

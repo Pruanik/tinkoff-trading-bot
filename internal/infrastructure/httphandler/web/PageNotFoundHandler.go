@@ -8,8 +8,7 @@ import (
 )
 
 func NewPageNotFoundHandler() *PageNotFoundHandler {
-	handler := PageNotFoundHandler{}
-	return &handler
+	return &PageNotFoundHandler{}
 }
 
 type PageNotFoundHandler struct{}
