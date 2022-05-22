@@ -23,9 +23,9 @@ import { RouterLink } from "vue-router";
                 <li>
                   <RouterLink to="/">Dashboard</RouterLink>
                 </li>
-                <li>
+                <!-- <li>
                   <RouterLink to="/profile">Profile</RouterLink>
-                </li>
+                </li> -->
                 <li>
                   <RouterLink to="/logs">Logs</RouterLink>
                 </li>

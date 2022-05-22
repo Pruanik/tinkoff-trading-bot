@@ -17,11 +17,11 @@ func (gibb GetInstrumentsBodyBuilder) CreateBody(instruments []model.Instrument)
 
 	for i := 0; i < len(instruments); i++ {
 		item := item.GetInstrumentsResponseBody{
-			Id:        instruments[0].Id,
-			Figi:      instruments[0].Figi,
-			Name:      instruments[0].Name,
-			Type:      instruments[0].Type,
-			CreatedAt: instruments[0].CreatedAt,
+			Id:        instruments[i].Id,
+			Figi:      instruments[i].Figi,
+			Name:      instruments[i].Name,
+			Type:      instruments[i].Type,
+			CreatedAt: instruments[i].CreatedAt,
 		}
 		body = append(body, item)
 	}

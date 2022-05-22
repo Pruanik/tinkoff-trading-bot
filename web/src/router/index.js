@@ -9,11 +9,11 @@ const router = createRouter({
       name: "Dashboard",
       component: DashboardView,
     },
-    {
-      path: "/profile",
-      name: "Profile",
-      component: () => import("../views/ProfileView.vue"),
-    },
+    // {
+    //   path: "/profile",
+    //   name: "Profile",
+    //   component: () => import("../views/ProfileView.vue"),
+    // },
     {
       path: "/logs",
       name: "Logs",

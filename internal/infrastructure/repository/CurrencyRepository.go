@@ -2,24 +2,26 @@ package repository
 
 import (
 	"context"
-	"errors"
 
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/repository"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/database"
+	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
 )
 
-func NewCurrencyRepository(db database.DatabaseInterface) repository.CurrencyRepositoryInterface {
-	return &CurrencyRepository{db: db}
+func NewCurrencyRepository(db database.DatabaseInterface, logger log.LoggerInterface) repository.CurrencyRepositoryInterface {
+	return &CurrencyRepository{db: db, logger: logger}
 }
 
 type CurrencyRepository struct {
-	db database.DatabaseInterface
+	db     database.DatabaseInterface
+	logger log.LoggerInterface
 }
 
 func (cr *CurrencyRepository) Save(ctx context.Context, currency *model.Currency) (*model.Currency, error) {
 	res := cr.db.GetConnection().Save(currency)
 	if res.Error != nil {
+		cr.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
 		return nil, res.Error
 	}
 
@@ -29,9 +31,10 @@ func (cr *CurrencyRepository) Save(ctx context.Context, currency *model.Currency
 func (cr *CurrencyRepository) GetCurrencyByFigi(ctx context.Context, figi string) (*model.Currency, error) {
 	var currency model.Currency
 
-	result := cr.db.GetConnection().Model(&model.Currency{}).Where("figi = ?", figi).Find(&currency)
-	if result.Error != nil {
-		return nil, errors.New("GetCurrencyByFigi: " + result.Error.Error())
+	res := cr.db.GetConnection().Model(&model.Currency{}).Where("figi = ?", figi).Find(&currency)
+	if res.Error != nil {
+		cr.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
+		return nil, res.Error
 	}
 
 	return &currency, nil
