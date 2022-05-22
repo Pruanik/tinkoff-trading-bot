@@ -3,6 +3,7 @@ create table if not exists logs
     id         bigserial primary key,
 	category   varchar   not null,
 	level      varchar   not null,
+	message    varchar   not null,
 	context    jsonb     not null,
 	created_at timestamp not null
 );

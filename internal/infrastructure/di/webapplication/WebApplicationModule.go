@@ -13,6 +13,7 @@ import (
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/di/common"
 	apiHandler "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/httphandler/api"
 	webHandler "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/httphandler/web"
+	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/repository"
 	"go.uber.org/fx"
 )
@@ -44,11 +45,12 @@ func (wam WebApplicationModule) BuildOptions(config *configs.Config) fx.Option {
 	return options
 }
 
-func (wam WebApplicationModule) startApplicationServer(lc fx.Lifecycle, server *http.Server) {
+func (wam WebApplicationModule) startApplicationServer(lc fx.Lifecycle, server *http.Server, logger log.LoggerInterface) {
 	lc.Append(
 		fx.Hook{
 			OnStart: func(ctx context.Context) error {
 				go func() {
+					logger.Info(log.LogCategorySystem, "Start HTTP Server", make(map[string]interface{}))
 					err := server.ListenAndServe()
 					if err != nil {
 						fmt.Printf("HTTP Server has error while it try to start! Error: %s", err)
