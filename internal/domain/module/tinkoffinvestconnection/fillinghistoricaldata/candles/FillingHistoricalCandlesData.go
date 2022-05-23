@@ -6,12 +6,13 @@ import (
 	"time"
 
 	"github.com/Pruanik/tinkoff-trading-bot/configs"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/module/tinkoffinvestconnection/tinkoffinvest"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/repository"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/dateoperation"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/grpc/investapi"
 	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"github.com/shopspring/decimal"
 )
 
 func NewFillingHistoricalCandlesData(
@@ -70,27 +71,38 @@ func (fhcd FillingHistoricalCandlesData) fillingData(ctx context.Context, figi s
 	if err != nil {
 		return
 	}
+	// для получения исторических данных, мы будем двигаться
+	// от настоящего к прошлому, пока значение не дойдет до
+	// отметки обозначенного в конфиге PeriodMonthForGetHistoricalData
+	// или до значения последней свечи, которая уже есть у нас в базе
+	timeTo := time.Now()
 	monthPeriod := fhcd.config.ApplicationConfig.PeriodMonthForGetHistoricalData
+	maxTimeFrom := time.Now().AddDate(0, -monthPeriod, 0)
 
-	var timestampFrom *timestamppb.Timestamp
-	if lastCandle.Id == 0 || fhcd.dateOperation.MonthsCountSince(lastCandle.Time) > monthPeriod {
-		timeFrom := time.Now().AddDate(0, -monthPeriod, 0)
-		timestampFrom = timestamppb.New(timeFrom)
-	} else {
-		timestampFrom = timestamppb.New(lastCandle.Time)
+	for timeTo.After(maxTimeFrom) && timeTo.After(lastCandle.Timestamp) {
+		timeFrom := timeTo.AddDate(0, 0, -1)
+		candles, err := fhcd.marketDataService.GetHistoricalCandlesByFigi(ctx, figi, timeFrom, timeTo)
+		if err != nil {
+			fhcd.logger.Error(log.LogCategoryGrpcTinkoff, err.Error(), map[string]interface{}{"service": "FillingHistoricalCandlesData", "method": "fillingData", "action": "getRotaionsHistoricalData"})
+			continue
+		}
+		fhcd.saveCandles(ctx, figi, candles.Candles)
+		timeTo = timeFrom
 	}
-
-	fhcd.logger.Info(log.LogCategoryGrpcTinkoff, fmt.Sprintf("Load historical data for %s from %s", figi, timestampFrom.String()), make(map[string]interface{}))
-	candles, err := fhcd.marketDataService.GetHistoricalCandlesByFigi(ctx, figi, timestampFrom)
-	if err != nil {
-		return
-	}
-
-	fhcd.saveCandles(ctx, figi, candles.Candles)
 }
 
 func (fhcd FillingHistoricalCandlesData) saveCandles(ctx context.Context, figi string, candles []*investapi.HistoricCandle) {
 	for i := 0; i < len(candles); i++ {
-		fmt.Println(figi + " " + candles[i].High.String())
+		open, openErr := decimal.NewFromString(fmt.Sprintf("%d.%d", candles[i].Open.Units, candles[i].Open.Nano))
+		high, highErr := decimal.NewFromString(fmt.Sprintf("%d.%d", candles[i].High.Units, candles[i].High.Nano))
+		low, lowErr := decimal.NewFromString(fmt.Sprintf("%d.%d", candles[i].Low.Units, candles[i].Low.Nano))
+		close, closeErr := decimal.NewFromString(fmt.Sprintf("%d.%d", candles[i].Close.Units, candles[i].Close.Nano))
+
+		if openErr != nil || highErr != nil || lowErr != nil || closeErr != nil {
+			fhcd.logger.Error(log.LogCategoryGrpcTinkoff, "Problem with handle historical candle", map[string]interface{}{"service": "FillingHistoricalCandlesData", "method": "saveCandles", "action": "saveCandles"})
+		}
+		candle := model.NewCandle(figi, open, high, low, close, candles[i].Volume, candles[i].Time.AsTime())
+
+		fhcd.candleRepository.Save(ctx, candle)
 	}
 }

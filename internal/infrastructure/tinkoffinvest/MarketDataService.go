@@ -2,6 +2,7 @@ package tinkoffinvest
 
 import (
 	"context"
+	"time"
 
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/module/tinkoffinvestconnection/tinkoffinvest"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/grpc/investapi"
@@ -18,12 +19,12 @@ type MarketDataService struct {
 	logger log.LoggerInterface
 }
 
-func (mds MarketDataService) GetHistoricalCandlesByFigi(ctx context.Context, figi string, from *timestamppb.Timestamp) (*investapi.GetCandlesResponse, error) {
+func (mds MarketDataService) GetHistoricalCandlesByFigi(ctx context.Context, figi string, from time.Time, to time.Time) (*investapi.GetCandlesResponse, error) {
 	getCandlesRequest := investapi.GetCandlesRequest{
 		Figi:     figi,
-		From:     from,
-		To:       timestamppb.Now(),
-		Interval: investapi.CandleInterval_CANDLE_INTERVAL_1_MIN,
+		From:     timestamppb.New(from),
+		To:       timestamppb.New(to),
+		Interval: investapi.CandleInterval_CANDLE_INTERVAL_HOUR,
 	}
 	candles, err := mds.client.GetCandles(ctx, &getCandlesRequest)
 	if err != nil {

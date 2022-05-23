@@ -2,7 +2,6 @@ create table if not exists candles
 (
     id         bigserial primary key,
 	figi       varchar   not null,
-	interval   integer,
 	open       decimal   not null,
 	high       decimal   not null,
 	low        decimal   not null,
