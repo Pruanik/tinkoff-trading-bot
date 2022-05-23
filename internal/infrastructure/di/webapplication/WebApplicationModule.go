@@ -34,9 +34,11 @@ func (wam WebApplicationModule) BuildOptions(config *configs.Config) fx.Option {
 			apiHandler.NewInstrumentApiHandler,
 			repository.NewInstrumentRepository,
 			repository.NewLogRepository,
+			repository.NewInstrumentSettingRepository,
 			builder.NewHttpResponseBuilder,
 			builder.NewGetInstrumentsBodyBuilder,
 			builder.NewGetLogsBodyBuilder,
+			builder.NewGetCollectingInstrumentsBodyBuilder,
 		),
 		fx.Invoke(
 			server.RegisterRoutes,

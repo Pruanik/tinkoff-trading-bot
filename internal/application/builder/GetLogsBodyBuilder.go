@@ -25,6 +25,7 @@ func (glbb GetLogsBodyBuilder) CreateBody(logs []model.Log) []item.GetLogsRespon
 			Id:        logs[i].Id,
 			Category:  logs[i].Category,
 			Level:     logs[i].Level,
+			Message:   logs[i].Message,
 			Context:   context,
 			CreatedAt: logs[i].CreatedAt,
 		}

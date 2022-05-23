@@ -33,11 +33,13 @@ func (lah LogApiHandler) Handle(ctx *gin.Context) {
 	logs, err := lah.logRepository.GetLogsDesc(ctx, lastId, limit)
 	if err != nil {
 		ctx.JSONP(http.StatusBadRequest, lah.httpResponseBuilder.BuildErrorResponse(err.Error()))
+		return
 	}
 
 	responseBody := lah.getLogsBodyBuilder.CreateBody(logs)
 	if err != nil {
 		ctx.JSONP(http.StatusBadRequest, lah.httpResponseBuilder.BuildErrorResponse(err.Error()))
+		return
 	}
 
 	ctx.JSONP(http.StatusOK, lah.httpResponseBuilder.BuildSuccessResponse(responseBody))
