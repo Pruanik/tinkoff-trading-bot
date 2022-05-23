@@ -30,7 +30,7 @@ const point = {
 };
 
 export default {
-  name: "Chart",
+  name: "ChartTab",
   components: {
     apexcharts: VueApexCharts,
   },

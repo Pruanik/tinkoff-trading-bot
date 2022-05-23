@@ -86,8 +86,7 @@ export default {
       this.collectingInstrumentsList = data.Body;
     },
     setCollectingInstrument() {
-      let currentInstrumentFigiAdding = this.currentInstrumentFigiAdding ?? {};
-      if (!currentInstrumentFigiAdding.hasOwnProperty("figi")) {
+      if (Object.keys(this.currentInstrumentFigiAdding ?? {}).length == 0) {
         this.warningNotification("You should choose instrument!");
         return;
       }
