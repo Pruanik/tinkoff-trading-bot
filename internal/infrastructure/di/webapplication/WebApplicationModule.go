@@ -32,6 +32,7 @@ func (wam WebApplicationModule) BuildOptions(config *configs.Config) fx.Option {
 			webHandler.NewPageNotFoundHandler,
 			apiHandler.NewLogApiHandler,
 			apiHandler.NewInstrumentApiHandler,
+			apiHandler.NewSystemApiHandler,
 			repository.NewInstrumentRepository,
 			repository.NewLogRepository,
 			repository.NewInstrumentSettingRepository,
@@ -57,7 +58,8 @@ func (wam WebApplicationModule) startApplicationServer(lc fx.Lifecycle, server *
 					logger.Info(log.LogCategorySystem, "Start HTTP Server", make(map[string]interface{}))
 					err := server.ListenAndServe()
 					if err != nil {
-						fmt.Printf("HTTP Server has error while it try to start! Error: %s", err)
+						message := fmt.Sprintf("HTTP Server has error while it try to start! Error: %s", err)
+						logger.Error(log.LogCategorySystem, message, make(map[string]interface{}))
 					}
 				}()
 				return nil

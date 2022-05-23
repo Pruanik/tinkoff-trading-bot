@@ -5,10 +5,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewApiRouter(logApiHandler *api.LogApiHandler, instrumentApiHandler *api.InstrumentApiHandler) *ApiRouter {
+func NewApiRouter(
+	logApiHandler *api.LogApiHandler,
+	instrumentApiHandler *api.InstrumentApiHandler,
+	systemApiHandler *api.SystemApiHandler,
+) *ApiRouter {
 	router := ApiRouter{
 		logApiHandler:        logApiHandler,
 		instrumentApiHandler: instrumentApiHandler,
+		systemApiHandler:     systemApiHandler,
 	}
 	return &router
 }
@@ -16,6 +21,7 @@ func NewApiRouter(logApiHandler *api.LogApiHandler, instrumentApiHandler *api.In
 type ApiRouter struct {
 	logApiHandler        *api.LogApiHandler
 	instrumentApiHandler *api.InstrumentApiHandler
+	systemApiHandler     *api.SystemApiHandler
 }
 
 func (ar *ApiRouter) Create(router *gin.Engine) {
@@ -24,4 +30,5 @@ func (ar *ApiRouter) Create(router *gin.Engine) {
 	apiRouterGroup.GET("/getInstruments", ar.instrumentApiHandler.HandleGetInstruments)
 	apiRouterGroup.GET("/getCollectingInstruments", ar.instrumentApiHandler.HandleGetCollectingInstruments)
 	apiRouterGroup.GET("/setCollectingInstrument", ar.instrumentApiHandler.HandleSetCollectingInstrument)
+	apiRouterGroup.GET("/getMod", ar.systemApiHandler.HandleGetMod)
 }

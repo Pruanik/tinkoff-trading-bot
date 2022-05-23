@@ -13,6 +13,7 @@ import { RouterLink } from "vue-router";
             </RouterLink>
           </li>
         </ul>
+        <p>Mod: {{ mod }}</p>
       </div>
       <div class="uk-navbar-right">
         <ul class="uk-navbar-nav">
@@ -37,3 +38,33 @@ import { RouterLink } from "vue-router";
     </nav>
   </header>
 </template>
+
+<script>
+import axios from "axios";
+
+export default {
+  data() {
+    return {
+      mod: "",
+    };
+  },
+  methods: {
+    getMod() {
+      axios
+        .get("/api/getMod")
+        .then((response) => this.handleGetModResponse(response.data))
+        .catch((error) => console.log(error));
+    },
+    handleGetModResponse: function (data) {
+      if (data.Body.Mod === "production") {
+        this.mod = "production";
+      } else {
+        this.mod = "sandbox";
+      }
+    },
+  },
+  mounted() {
+    this.getMod();
+  },
+};
+</script>
