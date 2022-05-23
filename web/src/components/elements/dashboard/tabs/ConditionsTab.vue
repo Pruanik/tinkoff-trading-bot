@@ -63,3 +63,14 @@
     </table>
   </div>
 </template>
+
+<script>
+export default {
+  mounted() {
+    console.log("mounted conditions");
+  },
+  unmounted() {
+    console.log("unmounted conditions");
+  },
+};
+</script>

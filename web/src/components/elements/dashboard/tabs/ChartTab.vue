@@ -55,5 +55,11 @@ export default {
       ],
     };
   },
+  mounted() {
+    console.log("mounted tab");
+  },
+  unmounted() {
+    console.log("unmounted tab");
+  },
 };
 </script>
