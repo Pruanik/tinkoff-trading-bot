@@ -44,7 +44,7 @@ func (fci FillingCurrenciesInfo) CheckExistAndLoadInfo(ctx context.Context) {
 
 		instruments := currencies.Instruments
 
-		for i := 1; i < len(instruments); i++ {
+		for i := 0; i < len(instruments); i++ {
 			instrument := model.NewInstrument(
 				instruments[i].GetFigi(),
 				instruments[i].GetName(),

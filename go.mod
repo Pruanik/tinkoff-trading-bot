@@ -40,6 +40,7 @@ require (
 
 require (
 	github.com/gin-gonic/gin v1.7.7
+	github.com/shopspring/decimal v1.3.1
 	github.com/sirupsen/logrus v1.8.1
 	go.uber.org/atomic v1.6.0 // indirect
 	go.uber.org/dig v1.14.0 // indirect

@@ -6,6 +6,7 @@ import (
 
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/builder"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/module/tinkoffinvestconnection/fillinghistoricaldata/candles"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/repository"
 	"github.com/gin-gonic/gin"
 )
@@ -16,6 +17,7 @@ func NewInstrumentApiHandler(
 	instrumentSettingRepository repository.InstrumentSettingRepositoryInterface,
 	getInstrumentsBodyBuilder builder.GetInstrumentsBodyBuilderInterface,
 	getCollectingInstrumentsBodyBuilder builder.GetCollectingInstrumentsBodyBuilderInterface,
+	fillingHistoricalCandlesData candles.FillingHistoricalCandlesDataInterface,
 ) *InstrumentApiHandler {
 	return &InstrumentApiHandler{
 		httpResponseBuilder:                 httpResponseBuilder,
@@ -23,6 +25,7 @@ func NewInstrumentApiHandler(
 		instrumentSettingRepository:         instrumentSettingRepository,
 		getInstrumentsBodyBuilder:           getInstrumentsBodyBuilder,
 		getCollectingInstrumentsBodyBuilder: getCollectingInstrumentsBodyBuilder,
+		fillingHistoricalCandlesData:        fillingHistoricalCandlesData,
 	}
 }
 
@@ -32,6 +35,7 @@ type InstrumentApiHandler struct {
 	instrumentSettingRepository         repository.InstrumentSettingRepositoryInterface
 	getInstrumentsBodyBuilder           builder.GetInstrumentsBodyBuilderInterface
 	getCollectingInstrumentsBodyBuilder builder.GetCollectingInstrumentsBodyBuilderInterface
+	fillingHistoricalCandlesData        candles.FillingHistoricalCandlesDataInterface
 }
 
 func (iah InstrumentApiHandler) HandleGetInstruments(ctx *gin.Context) {
@@ -80,6 +84,7 @@ func (iah InstrumentApiHandler) HandleSetCollectingInstrument(ctx *gin.Context) 
 		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(saveError.Error()))
 		return
 	}
+	iah.fillingHistoricalCandlesData.FillingHistoricalDataByFigi(ctx, *figi)
 
 	ctx.JSONP(http.StatusOK, iah.httpResponseBuilder.BuildSuccessResponse(nil))
 }

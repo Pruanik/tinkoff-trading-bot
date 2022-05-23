@@ -2,6 +2,7 @@ package configs
 
 import (
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -28,6 +29,9 @@ type Config struct {
 		GrpcUrl         string
 		GrpcPort        string
 	}
+	ApplicationConfig struct {
+		PeriodMonthForGetHistoricalData int
+	}
 }
 
 func NewConfig() (*Config, error) {
@@ -50,6 +54,7 @@ func (c *Config) loadConfiguration() error {
 	c.loadDatabaseConfiguration()
 	c.loadWebApplicationConfiguration()
 	c.loadTinkoffInvestConfiguration()
+	c.loadApplicationConfiguration()
 
 	return nil
 }
@@ -84,4 +89,13 @@ func (c *Config) loadTinkoffInvestConfiguration() {
 	c.TinkoffInvestConfig.SandboxToken = os.Getenv("SANDBOX_TOKEN")
 	c.TinkoffInvestConfig.GrpcUrl = os.Getenv("TINKOFF_INVEST_URL")
 	c.TinkoffInvestConfig.GrpcPort = os.Getenv("TINKOFF_INVEST_PORT")
+}
+
+func (c *Config) loadApplicationConfiguration() {
+	period, err := strconv.Atoi(os.Getenv("APP_PERIOD_MONTH_FOR_GET_HISTORICAL_DATA"))
+	if err != nil {
+		period = 6
+	}
+
+	c.ApplicationConfig.PeriodMonthForGetHistoricalData = period
 }
