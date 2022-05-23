@@ -3,7 +3,7 @@
 
 Торговый робот разработан в рамках конкурса [Tinkoff Invest Robot Contest](https://github.com/Tinkoff/invest-robot-contest) и предназначен для ведения автоматической торговли на бирже Tinkoff Invest, используя APIv2 на основе gRPC протокола.
 
-[![Screenshot 1](https://github.com/Pruanik/tinkoff-trading-bot/screenshots/screenshot_1.png)]()
+[![Screenshot 1](https://github.com/Pruanik/tinkoff-trading-bot/raw/master/screenshots/screenshot_1.png)]()
 
 Основные преимущества данного проекта:
 - ✨ Возможность пробовать различные настраиваемые стратегии. Любой алгоритм и его правила могут быть добавлены и выбраны в интерфейсе для использования.
@@ -43,11 +43,11 @@ make up
 - Dashboard с возможностью отслеживания и настройки процессов работы
 - Profile с отображением актуальной информации об аккаунтах пользователя
 - Logs с информацией из таблицы logs в которой фиксируются ключевые факторы работы системы
-[![Screenshot 2](https://github.com/Pruanik/tinkoff-trading-bot/screenshots/screenshot_2.png)]()
-[![Screenshot 3](https://github.com/Pruanik/tinkoff-trading-bot/screenshots/screenshot_3.png)]()
+[![Screenshot 2](https://github.com/Pruanik/tinkoff-trading-bot/raw/master/screenshots/screenshot_2.png)]()
+[![Screenshot 3](https://github.com/Pruanik/tinkoff-trading-bot/raw/master/screenshots/screenshot_3.png)]()
 
 ## Структура проекта
-[![Screenshot 4](https://github.com/Pruanik/tinkoff-trading-bot/screenshots/screenshot_4.png)]()
+[![Screenshot 4](https://github.com/Pruanik/tinkoff-trading-bot/raw/master/screenshots/screenshot_4.png)]()
 Проект поделен на несколько контейнеров:
 - WebApplication - все что связано с UI частью: веб сервер, frontend логика, api.
 - TradingStrategy - запуск анализа накопленных данных для создания условий к покупке или продаже позиций. Может переодически запускать разные стратегии с разными параметрами на разные иснтрументы для работы с накопленными данными.
