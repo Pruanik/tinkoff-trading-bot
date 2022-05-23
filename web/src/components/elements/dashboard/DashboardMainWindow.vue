@@ -42,6 +42,7 @@ import ConditionsTab from "@/components/elements/dashboard/tabs/ConditionsTab.vu
 import SettingsTab from "@/components/elements/dashboard/tabs/SettingsTab.vue";
 
 export default {
+  props: ['figi'],
   data() {
     return {
       activeWindow: "chartTab",

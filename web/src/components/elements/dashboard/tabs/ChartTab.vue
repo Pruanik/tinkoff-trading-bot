@@ -42,7 +42,10 @@ export default {
         title: title,
         annotations: {
           points: [point],
-        }
+        },
+        stroke: {
+          width: 2,
+        },
       },
       series: [
         {

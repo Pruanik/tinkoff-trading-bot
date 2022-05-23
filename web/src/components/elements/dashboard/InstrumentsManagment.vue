@@ -1,30 +1,45 @@
 <template>
-  <div>
-    <div class="uk-flex uk-flex-column">
-      <v-select
-        :options="selectOptions"
-        label="instrumentName"
-        index="figi"
-        v-model="currentInstrumentFigiAdding"
-      />
-      <button
-        class="uk-button uk-button-default uk-margin-small-top"
-        v-on:click="setCollectingInstrument()"
-      >
-        +
-      </button>
+  <div
+    class="uk-grid-small uk-child-width-1-2@s uk-flex-center uk-text-center"
+    uk-grid
+  >
+    <div class="uk-width-1-1@m">
+      <div class="uk-card uk-card-default uk-card-body uk-flex uk-flex-row">
+        <v-select
+          class="uk-flex-left"
+          style="width: 100%"
+          :options="selectOptions"
+          label="instrumentName"
+          index="figi"
+          v-model="currentInstrumentFigiAdding"
+        />
+        <div v-if="sendRequestStatus" uk-spinner class="uk-margin-small-left"></div>
+        <button
+          v-else
+          class="uk-button uk-button-default uk-margin-small-left uk-flex-right"
+          v-on:click="setCollectingInstrument()"
+        >+</button>
+      </div>
     </div>
-
-    <ul class="uk-tab-left" uk-tab="animation: uk-animation-fade">
-      <li
-        v-for="collectingInstrument in collectingInstrumentsList"
-        :key="collectingInstrument.Figi"
-      >
-        <a href="#">
-          {{ collectingInstrument.Name }} ({{ collectingInstrument.Figi }})
-        </a>
-      </li>
-    </ul>
+    <div class="uk-width-1-5@m">
+      <div class="uk-card uk-card-default uk-card-body">
+        <ul class="uk-tab-left" uk-tab="animation: uk-animation-fade">
+          <li
+            v-for="collectingInstrument in collectingInstrumentsList"
+            :key="collectingInstrument.Figi"
+          >
+            <a href="#">
+              {{ collectingInstrument.Name }} ({{ collectingInstrument.Figi }})
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="uk-width-4-5@m">
+      <div class="uk-card uk-card-default uk-card-body">
+        <DashboardMainWindow />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -32,14 +47,17 @@
 import vSelect from "vue-select";
 import axios from "axios";
 import uikit from "uikit";
+import DashboardMainWindow from "@/components/elements/dashboard/DashboardMainWindow.vue";
 
 export default {
   name: "InstrumentsSidebar",
   components: {
     "v-select": vSelect,
+    DashboardMainWindow,
   },
   data() {
     return {
+      sendRequestStatus: false,
       currentInstrumentFigiAdding: {},
       selectOptions: [],
       collectingInstrumentsList: [],
@@ -90,7 +108,7 @@ export default {
         this.warningNotification("You should choose instrument!");
         return;
       }
-
+      this.sendRequestStatus = true;
       axios
         .get("/api/setCollectingInstrument", {
           params: { figi: this.currentInstrumentFigiAdding.figi, status: true },
@@ -101,6 +119,7 @@ export default {
           } else {
             this.getCollectingInstrumentsList();
           }
+          this.sendRequestStatus = false;
         })
         .catch((error) => console.log(error));
     },
