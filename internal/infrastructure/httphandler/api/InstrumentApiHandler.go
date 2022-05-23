@@ -51,7 +51,7 @@ func (iah InstrumentApiHandler) HandleGetInstruments(ctx *gin.Context) {
 }
 
 func (iah InstrumentApiHandler) HandleGetCollectingInstruments(ctx *gin.Context) {
-	instrumentsSettings, err := iah.instrumentSettingRepository.GetInstrumentsSettings(ctx)
+	instrumentsSettings, err := iah.instrumentSettingRepository.GetInstrumentsSettingsWhereIsCollectingTrue(ctx)
 	if err != nil {
 		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(err.Error()))
 		return

@@ -2,22 +2,24 @@ package fillingcurrenciesinfo
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/module/tinkoffinvestconnection/tinkoffinvest"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/repository"
+	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
 )
 
 func NewFillingCurrenciesInfo(
 	instrumentRepository repository.InstrumentRepositoryInterface,
 	currenciesRepository repository.CurrencyRepositoryInterface,
 	instrumentService tinkoffinvest.InstrumentServiceInterface,
+	logger log.LoggerInterface,
 ) FillingCurrenciesInfoInterface {
 	return &FillingCurrenciesInfo{
 		instrumentRepository: instrumentRepository,
 		currenciesRepository: currenciesRepository,
 		instrumentService:    instrumentService,
+		logger:               logger,
 	}
 }
 
@@ -25,18 +27,19 @@ type FillingCurrenciesInfo struct {
 	instrumentRepository repository.InstrumentRepositoryInterface
 	currenciesRepository repository.CurrencyRepositoryInterface
 	instrumentService    tinkoffinvest.InstrumentServiceInterface
+	logger               log.LoggerInterface
 }
 
-func (fsi FillingCurrenciesInfo) CheckExistAndLoadInfo(ctx context.Context) {
-	areCurrenciesExist, err := fsi.instrumentRepository.AreInstrumentsExistByType(ctx, "currency")
+func (fci FillingCurrenciesInfo) CheckExistAndLoadInfo(ctx context.Context) {
+	areCurrenciesExist, err := fci.instrumentRepository.AreInstrumentsExistByType(ctx, "currency")
 	if err != nil {
-		fmt.Println("checkDataExistAndLoad Error: " + err.Error())
+		return
 	}
 
 	if !areCurrenciesExist {
-		currencies, err := fsi.instrumentService.GetBaseCurrencies(ctx)
+		currencies, err := fci.instrumentService.GetBaseCurrencies(ctx)
 		if err != nil {
-			fmt.Println("GetBaseCurrencies error")
+			return
 		}
 
 		instruments := currencies.Instruments
@@ -47,9 +50,9 @@ func (fsi FillingCurrenciesInfo) CheckExistAndLoadInfo(ctx context.Context) {
 				instruments[i].GetName(),
 				"currency",
 			)
-			_, err = fsi.instrumentRepository.Save(ctx, instrument)
+			_, err = fci.instrumentRepository.Save(ctx, instrument)
 			if err != nil {
-				fmt.Println("instrumentRepository.Save error")
+				fci.logger.Error(log.LogCategoryLogic, err.Error(), map[string]interface{}{"service": "FillingCurrenciesInfo", "method": "CheckExistAndLoadInfo", "action": "save instrument"})
 			}
 
 			currency := model.NewCurrency(
@@ -70,10 +73,12 @@ func (fsi FillingCurrenciesInfo) CheckExistAndLoadInfo(ctx context.Context) {
 				instruments[i].GetApiTradeAvailableFlag(),
 			)
 
-			_, err = fsi.currenciesRepository.Save(ctx, currency)
+			_, err = fci.currenciesRepository.Save(ctx, currency)
 			if err != nil {
-				fmt.Println("currenciesRepository.Save error")
+				fci.logger.Error(log.LogCategoryLogic, err.Error(), map[string]interface{}{"service": "FillingCurrenciesInfo", "method": "CheckExistAndLoadInfo", "action": "save currency"})
 			}
 		}
+	} else {
+		fci.logger.Info(log.LogCategoryLogic, "Service does not need filling currencies", make(map[string]interface{}))
 	}
 }

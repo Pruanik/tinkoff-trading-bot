@@ -56,7 +56,7 @@ func (isr *InstrumentSettingRepository) Update(ctx context.Context, instrumentSe
 	return instrumentSetting, nil
 }
 
-func (isr *InstrumentSettingRepository) GetInstrumentsSettings(ctx context.Context) ([]model.InstrumentSettingWithName, error) {
+func (isr *InstrumentSettingRepository) GetInstrumentsSettingsWhereIsCollectingTrue(ctx context.Context) ([]model.InstrumentSettingWithName, error) {
 	var result []model.InstrumentSettingWithName
 	res := isr.db.GetConnection().Model(&model.Instrument{}).Select("instruments.figi, instruments.name, instrument_settings.is_data_collecting, instrument_settings.created_at").Joins("left join instrument_settings on instrument_settings.figi = instruments.figi").Where("instrument_settings.is_data_collecting = ?", true).Scan(&result)
 	if res.Error != nil {

@@ -11,10 +11,13 @@ import (
 	"github.com/Pruanik/tinkoff-trading-bot/configs"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/application/builder"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/di/common"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/grpc"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/grpc/investapi"
 	apiHandler "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/httphandler/api"
 	webHandler "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/httphandler/web"
 	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/repository"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/tinkoffinvest"
 	"go.uber.org/fx"
 )
 
@@ -40,6 +43,9 @@ func (wam WebApplicationModule) BuildOptions(config *configs.Config) fx.Option {
 			builder.NewGetInstrumentsBodyBuilder,
 			builder.NewGetLogsBodyBuilder,
 			builder.NewGetCollectingInstrumentsBodyBuilder,
+			grpc.NewGrpcConnection,
+			investapi.NewMarketDataServiceClient,
+			tinkoffinvest.NewMarketDataService,
 		),
 		fx.Invoke(
 			server.RegisterRoutes,

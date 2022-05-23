@@ -2,22 +2,24 @@ package fillingsharesinfo
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/module/tinkoffinvestconnection/tinkoffinvest"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/repository"
+	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
 )
 
 func NewFillingSharesInfo(
 	instrumentRepository repository.InstrumentRepositoryInterface,
 	shareRepository repository.ShareRepositoryInterface,
 	instrumentService tinkoffinvest.InstrumentServiceInterface,
+	logger log.LoggerInterface,
 ) FillingSharesInfoInterface {
 	return &FillingSharesInfo{
 		instrumentRepository: instrumentRepository,
 		shareRepository:      shareRepository,
 		instrumentService:    instrumentService,
+		logger:               logger,
 	}
 }
 
@@ -25,18 +27,19 @@ type FillingSharesInfo struct {
 	instrumentRepository repository.InstrumentRepositoryInterface
 	shareRepository      repository.ShareRepositoryInterface
 	instrumentService    tinkoffinvest.InstrumentServiceInterface
+	logger               log.LoggerInterface
 }
 
 func (fsi FillingSharesInfo) CheckExistAndLoadInfo(ctx context.Context) {
 	areSharesExist, err := fsi.instrumentRepository.AreInstrumentsExistByType(ctx, "share")
 	if err != nil {
-		fmt.Println("checkDataExistAndLoad Error: " + err.Error())
+		return
 	}
 
 	if !areSharesExist {
 		shares, err := fsi.instrumentService.GetBaseShares(ctx)
 		if err != nil {
-			fmt.Println("GetBaseShares error")
+			return
 		}
 
 		instruments := shares.Instruments
@@ -49,7 +52,7 @@ func (fsi FillingSharesInfo) CheckExistAndLoadInfo(ctx context.Context) {
 			)
 			_, err = fsi.instrumentRepository.Save(ctx, instrument)
 			if err != nil {
-				fmt.Println("instrumentRepository.Save error")
+				fsi.logger.Error(log.LogCategoryLogic, err.Error(), map[string]interface{}{"service": "FillingSharesInfo", "method": "CheckExistAndLoadInfo", "action": "save instrument"})
 			}
 
 			share := model.NewShare(
@@ -69,8 +72,10 @@ func (fsi FillingSharesInfo) CheckExistAndLoadInfo(ctx context.Context) {
 
 			_, err = fsi.shareRepository.Save(ctx, share)
 			if err != nil {
-				fmt.Println("shareRepository.Save error")
+				fsi.logger.Error(log.LogCategoryLogic, err.Error(), map[string]interface{}{"service": "FillingSharesInfo", "method": "CheckExistAndLoadInfo", "action": "save share"})
 			}
 		}
+	} else {
+		fsi.logger.Info(log.LogCategoryLogic, "Service does not need filling shares", make(map[string]interface{}))
 	}
 }

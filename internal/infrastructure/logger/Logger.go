@@ -16,6 +16,7 @@ const (
 	LogCategoryDatabase       = "application.database"
 	LogCategoryGrpcConnection = "application.grpc.connection"
 	LogCategoryGrpcTinkoff    = "application.grpc.tinkoff"
+	LogCategoryLogic          = "application.logic"
 )
 
 func NewLogger(db database.DatabaseInterface) LoggerInterface {

@@ -9,7 +9,7 @@ import (
 type InstrumentSettingRepositoryInterface interface {
 	Save(ctx context.Context, instrumentSetting *model.InstrumentSetting) (*model.InstrumentSetting, error)
 
-	GetInstrumentsSettings(ctx context.Context) ([]model.InstrumentSettingWithName, error)
+	GetInstrumentsSettingsWhereIsCollectingTrue(ctx context.Context) ([]model.InstrumentSettingWithName, error)
 
 	GetInstrumentSettingByFigi(ctx context.Context, figi string) (*model.InstrumentSetting, error)
 
