@@ -7,7 +7,8 @@ RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate
 
 FROM debian:bullseye-slim
 
-RUN apt-get update && apt-get install -q make openssl ca-certificates
+RUN apt-get -q update && apt-get install -qy make openssl ca-certificates wget netcat
+RUN wget https://raw.githubusercontent.com/eficode/wait-for/master/wait-for -O /wait-for && chmod +x /wait-for
 
 COPY --from=build /go/bin/migrate /migrate
 RUN chmod +x /migrate

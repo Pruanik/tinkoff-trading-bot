@@ -11,7 +11,6 @@ import (
 	"github.com/Pruanik/tinkoff-trading-bot/configs"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/application/builder"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/module/tinkoffinvestconnection/fillinghistoricaldata/candles"
-	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/dateoperation"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/di/common"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/grpc"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/grpc/investapi"
@@ -52,7 +51,6 @@ func (wam WebApplicationModule) BuildOptions(config *configs.Config) fx.Option {
 			investapi.NewMarketDataServiceClient,
 			tinkoffinvest.NewMarketDataService,
 			candles.NewFillingHistoricalCandlesData,
-			dateoperation.NewDateOperation,
 		),
 		fx.Invoke(
 			server.RegisterRoutes,

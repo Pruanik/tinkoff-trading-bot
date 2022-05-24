@@ -9,7 +9,6 @@ import (
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/module/tinkoffinvestconnection/tinkoffinvest"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/repository"
-	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/dateoperation"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/grpc/investapi"
 	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
 	"github.com/shopspring/decimal"
@@ -19,7 +18,6 @@ func NewFillingHistoricalCandlesData(
 	instrumentSettingRepository repository.InstrumentSettingRepositoryInterface,
 	candleRepository repository.CandleRepositoryInterface,
 	marketDataService tinkoffinvest.MarketDataServiceInterface,
-	dateOperation dateoperation.DateOperationInterface,
 	config *configs.Config,
 	logger log.LoggerInterface,
 ) FillingHistoricalCandlesDataInterface {
@@ -27,7 +25,6 @@ func NewFillingHistoricalCandlesData(
 		instrumentSettingRepository: instrumentSettingRepository,
 		candleRepository:            candleRepository,
 		marketDataService:           marketDataService,
-		dateOperation:               dateOperation,
 		config:                      config,
 		logger:                      logger,
 	}
@@ -37,7 +34,6 @@ type FillingHistoricalCandlesData struct {
 	instrumentSettingRepository repository.InstrumentSettingRepositoryInterface
 	candleRepository            repository.CandleRepositoryInterface
 	marketDataService           tinkoffinvest.MarketDataServiceInterface
-	dateOperation               dateoperation.DateOperationInterface
 	config                      *configs.Config
 	logger                      log.LoggerInterface
 }

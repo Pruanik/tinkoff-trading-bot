@@ -13,6 +13,9 @@ build-migrator:
 build-frontend:
 	@sh -c "'$(CURDIR)/scripts/build.sh' frontend"
 
+up-postgresql:
+	docker-compose up -d postgresql
+
 up:
 	docker-compose up -d webapplication tinkoffinvestconnection postgresql
 
