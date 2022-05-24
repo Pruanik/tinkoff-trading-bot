@@ -31,7 +31,6 @@ COPY --from=build /tmp/app/out/webapplication /app/webapplication
 RUN chmod +x /app/webapplication
 
 COPY --from=frontend /usr/src/app/dist /app/web/dist
-COPY web/static /app/web/static
 
 COPY build/package/webapplication/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
