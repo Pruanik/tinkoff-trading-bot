@@ -1,6 +1,5 @@
 <script setup>
 import InstrumentsManagment from "@/components/elements/dashboard/InstrumentsManagment.vue";
-
 </script>
 
 <template>

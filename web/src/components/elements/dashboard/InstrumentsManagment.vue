@@ -13,7 +13,11 @@
           index="figi"
           v-model="currentInstrumentFigiAdding"
         />
-        <div v-if="sendRequestStatus" uk-spinner class="uk-margin-small-left"></div>
+        <div
+          v-if="sendRequestStatus"
+          uk-spinner
+          class="uk-margin-small-left"
+        ></div>
         <button
           v-else
           class="uk-button uk-button-default uk-margin-small-left uk-flex-right"
@@ -28,7 +32,15 @@
             v-for="collectingInstrument in collectingInstrumentsList"
             :key="collectingInstrument.Figi"
           >
-            <a href="#">
+            <a
+              href="#"
+              v-on:click="
+                setActiveInstrument(
+                  collectingInstrument.Name,
+                  collectingInstrument.Figi
+                )
+              "
+            >
               {{ collectingInstrument.Name }} ({{ collectingInstrument.Figi }})
             </a>
           </li>
@@ -37,7 +49,7 @@
     </div>
     <div class="uk-width-4-5@m">
       <div class="uk-card uk-card-default uk-card-body">
-        <DashboardMainWindow />
+        <DashboardMainWindow v-bind:activeInstrument.sync="activeInstrument" />
       </div>
     </div>
   </div>
@@ -57,6 +69,7 @@ export default {
   },
   data() {
     return {
+      activeInstrument: { figi: "", name: "" },
       sendRequestStatus: false,
       currentInstrumentFigiAdding: {},
       selectOptions: [],
@@ -122,6 +135,10 @@ export default {
           this.sendRequestStatus = false;
         })
         .catch((error) => console.log(error));
+    },
+    setActiveInstrument: function (name, figi) {
+      this.activeInstrument.name = name;
+      this.activeInstrument.figi = figi;
     },
     warningNotification: function (message) {
       uikit.notification({

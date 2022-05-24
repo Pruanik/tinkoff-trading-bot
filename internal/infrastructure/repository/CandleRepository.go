@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/repository"
@@ -38,4 +39,28 @@ func (cr *CandleRepository) GetLastCandleByFigi(ctx context.Context, figi string
 	}
 
 	return &candle, nil
+}
+
+func (cr *CandleRepository) GetCandlesByFigiFromTime(ctx context.Context, figi string, time time.Time) ([]model.Candle, error) {
+	var candles []model.Candle
+
+	res := cr.db.GetConnection().Model(&model.Candle{}).Where("figi = ? and timestamp > ?", figi, time.Format("2006-01-02 15:04:05")).Order("timestamp").Find(&candles)
+	if res.Error != nil {
+		cr.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
+		return nil, res.Error
+	}
+
+	return candles, nil
+}
+
+func (cr *CandleRepository) GetCandlesByFigiFromLastId(ctx context.Context, figi string, lastId int) ([]model.Candle, error) {
+	var candles []model.Candle
+
+	res := cr.db.GetConnection().Model(&model.Candle{}).Where("figi = ? and id > ?", figi, lastId).Order("timestamp").Find(&candles)
+	if res.Error != nil {
+		cr.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
+		return nil, res.Error
+	}
+
+	return candles, nil
 }
