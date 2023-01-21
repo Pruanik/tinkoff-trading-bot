@@ -62,7 +62,7 @@ func (tic TinkoffInvestConnectionModule) startControllSettingsUpdate(
 			OnStart: func(ctx context.Context) error {
 				go func() {
 					fillingInstrumentsInfo.LoadInfo(ctx)
-					fillingHistoricalCandlesData.FillingHistoricalData(ctx)
+					// fillingHistoricalCandlesData.FillingHistoricalData(ctx)
 				}()
 				return nil
 			},

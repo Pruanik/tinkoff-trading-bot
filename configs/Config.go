@@ -42,7 +42,6 @@ func NewConfig() (*Config, error) {
 	}
 
 	return config, nil
-
 }
 
 func (c *Config) loadConfiguration() error {

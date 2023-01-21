@@ -7,6 +7,9 @@ build-all:
 build-webapp:
 	@sh -c "'$(CURDIR)/scripts/build.sh' webapplication"
 
+build-tinkoffconnection:
+	@sh -c "'$(CURDIR)/scripts/build.sh' tinkoffinvestconnection"
+
 build-migrator:
 	@sh -c "'$(CURDIR)/scripts/build.sh' migrator"
 
@@ -18,6 +21,9 @@ up-postgresql:
 
 up:
 	docker-compose up -d webapplication tinkoffinvestconnection postgresql
+
+stop:
+	docker-compose stop
 
 migration-create:
 	docker-compose run --rm --entrypoint "" migrator make migration-create $(RUN_ARGS)

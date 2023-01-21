@@ -59,6 +59,7 @@ make up
 - Logs с информацией из таблицы logs в которой фиксируются ключевые факторы работы системы
 [![Screenshot 2](https://github.com/Pruanik/tinkoff-trading-bot/raw/master/screenshots/screenshot_2.png)]()
 [![Screenshot 3](https://github.com/Pruanik/tinkoff-trading-bot/raw/master/screenshots/screenshot_3.png)]()
+Расшифровка всех ошибок находится на [сайте документации](https://tinkoff.github.io/investAPI/errors/)
 
 ## Структура проекта
 [![Screenshot 4](https://github.com/Pruanik/tinkoff-trading-bot/raw/master/screenshots/screenshot_4.png)]()
