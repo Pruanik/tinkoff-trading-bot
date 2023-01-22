@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 #Create GO Lang application
-FROM golang:1.17.6-bullseye as build
+FROM golang:1.19.5-bullseye as build
 
 RUN mkdir -p /tmp/app/src
 COPY . /tmp/app/src

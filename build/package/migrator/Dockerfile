@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM golang:1.17.6-bullseye as build
+FROM golang:1.19.5-bullseye as build
 
 ARG MIGRATE_PACKAGE_TAG=v4.15.2
 
