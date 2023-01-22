@@ -6,6 +6,7 @@ import (
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/repository"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/database"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/database/mapping"
 	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
 )
 
@@ -19,7 +20,8 @@ type InstrumentSettingRepository struct {
 }
 
 func (isr *InstrumentSettingRepository) Save(ctx context.Context, instrumentSetting *model.InstrumentSetting) (*model.InstrumentSetting, error) {
-	res := isr.db.GetConnection().Save(instrumentSetting)
+	mappedInstrumentSetting := mapping.InstrumentSetting(*instrumentSetting)
+	res := isr.db.GetConnection().Save(&mappedInstrumentSetting)
 	if res.Error != nil {
 		isr.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
 		return nil, res.Error
@@ -31,7 +33,7 @@ func (isr *InstrumentSettingRepository) Save(ctx context.Context, instrumentSett
 func (isr *InstrumentSettingRepository) GetInstrumentSettingByFigi(ctx context.Context, figi string) (*model.InstrumentSetting, error) {
 	var instrumentSetting model.InstrumentSetting
 
-	res := isr.db.GetConnection().Model(&model.InstrumentSetting{}).Where("figi = ?", figi).Find(&instrumentSetting)
+	res := isr.db.GetConnection().Model(&mapping.InstrumentSetting{}).Where("figi = ?", figi).Find(&instrumentSetting)
 	if res.Error != nil {
 		isr.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
 		return nil, res.Error
@@ -50,7 +52,7 @@ func (isr *InstrumentSettingRepository) Update(ctx context.Context, instrumentSe
 	if instrumentSettingInDb.Id == 0 {
 		isr.Save(ctx, instrumentSetting)
 	} else {
-		isr.db.GetConnection().Model(&model.InstrumentSetting{}).Where("figi = ?", instrumentSetting.Figi).Update("is_data_collecting", instrumentSetting.IsDataCollecting)
+		isr.db.GetConnection().Model(&mapping.InstrumentSetting{}).Where("figi = ?", instrumentSetting.Figi).Update("is_data_collecting", instrumentSetting.IsDataCollecting)
 	}
 
 	return instrumentSetting, nil
@@ -58,7 +60,7 @@ func (isr *InstrumentSettingRepository) Update(ctx context.Context, instrumentSe
 
 func (isr *InstrumentSettingRepository) GetInstrumentsSettingsWhereIsCollectingTrue(ctx context.Context) ([]model.InstrumentSettingWithName, error) {
 	var result []model.InstrumentSettingWithName
-	res := isr.db.GetConnection().Model(&model.Instrument{}).Select("instruments.figi, instruments.name, instrument_settings.is_data_collecting, instrument_settings.created_at").Joins("left join instrument_settings on instrument_settings.figi = instruments.figi").Where("instrument_settings.is_data_collecting = ?", true).Scan(&result)
+	res := isr.db.GetConnection().Model(&mapping.Instrument{}).Select("instruments.figi, instruments.name, instrument_settings.is_data_collecting, instrument_settings.created_at").Joins("left join instrument_settings on instrument_settings.figi = instruments.figi").Where("instrument_settings.is_data_collecting = ?", true).Scan(&result)
 	if res.Error != nil {
 		isr.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
 		return nil, res.Error

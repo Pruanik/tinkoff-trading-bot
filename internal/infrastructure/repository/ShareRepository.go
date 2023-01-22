@@ -6,6 +6,7 @@ import (
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/repository"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/database"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/database/mapping"
 	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
 )
 
@@ -19,7 +20,8 @@ type ShareRepository struct {
 }
 
 func (sr *ShareRepository) Save(ctx context.Context, share *model.Share) (*model.Share, error) {
-	res := sr.db.GetConnection().Save(share)
+	mappedShare := mapping.Share(*share)
+	res := sr.db.GetConnection().Save(&mappedShare)
 	if res.Error != nil {
 		sr.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
 		return nil, res.Error
@@ -31,7 +33,7 @@ func (sr *ShareRepository) Save(ctx context.Context, share *model.Share) (*model
 func (sr *ShareRepository) GetShareByFigi(ctx context.Context, figi string) (*model.Share, error) {
 	var share model.Share
 
-	res := sr.db.GetConnection().Model(&model.Share{}).Where("figi = ?", figi).Find(&share)
+	res := sr.db.GetConnection().Model(&mapping.Share{}).Where("figi = ?", figi).Find(&share)
 	if res.Error != nil {
 		sr.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
 		return nil, res.Error

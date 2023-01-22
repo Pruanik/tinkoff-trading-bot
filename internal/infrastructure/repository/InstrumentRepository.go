@@ -6,6 +6,7 @@ import (
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/repository"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/database"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/database/mapping"
 	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
 )
 
@@ -19,7 +20,8 @@ type InstrumentRepository struct {
 }
 
 func (ir *InstrumentRepository) Save(ctx context.Context, instrument *model.Instrument) (*model.Instrument, error) {
-	res := ir.db.GetConnection().Save(instrument)
+	mappedInstrument := mapping.Instrument(*instrument)
+	res := ir.db.GetConnection().Save(&mappedInstrument)
 	if res.Error != nil {
 		ir.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
 		return nil, res.Error
@@ -31,7 +33,7 @@ func (ir *InstrumentRepository) Save(ctx context.Context, instrument *model.Inst
 func (ir *InstrumentRepository) GetInstruments(ctx context.Context) ([]model.Instrument, error) {
 	var instruments []model.Instrument
 
-	res := ir.db.GetConnection().Model(&model.Instrument{}).Order("type, name").Find(&instruments)
+	res := ir.db.GetConnection().Model(&mapping.Instrument{}).Order("type, name").Find(&instruments)
 	if res.Error != nil {
 		ir.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
 		return nil, res.Error
@@ -43,7 +45,7 @@ func (ir *InstrumentRepository) GetInstruments(ctx context.Context) ([]model.Ins
 func (ir *InstrumentRepository) GetInstrumentsByType(ctx context.Context, instrumentType string) ([]model.Instrument, error) {
 	var instruments []model.Instrument
 
-	res := ir.db.GetConnection().Model(&model.Instrument{}).Where("type = ?", instrumentType).Order("type, name").Find(&instruments)
+	res := ir.db.GetConnection().Model(&mapping.Instrument{}).Where("type = ?", instrumentType).Order("type, name").Find(&instruments)
 	if res.Error != nil {
 		ir.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
 		return nil, res.Error
@@ -54,7 +56,7 @@ func (ir *InstrumentRepository) GetInstrumentsByType(ctx context.Context, instru
 
 func (ir *InstrumentRepository) AreInstrumentsExistByType(ctx context.Context, instrumentType string) (bool, error) {
 	var instruments []model.Instrument
-	err := ir.db.GetConnection().Model(&model.Instrument{}).Where("type = ?", instrumentType).Limit(1).Find(&instruments).Error
+	err := ir.db.GetConnection().Model(&mapping.Instrument{}).Where("type = ?", instrumentType).Limit(1).Find(&instruments).Error
 	if err != nil {
 		ir.logger.Error(log.LogCategoryDatabase, err.Error(), make(map[string]interface{}))
 		return false, err

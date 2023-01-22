@@ -1,29 +1,34 @@
 RUN_ARGS := $(wordlist 2, $(words $(MAKECMDGOALS)), $(MAKECMDGOALS))
 $(eval $(RUN_ARGS):;@:)
 
+### Building Docker Containers ###
 build-all:
-	@sh -c "'$(CURDIR)/scripts/build.sh'"
+	@sh -c "'$(CURDIR)/scripts/build-containers.sh'"
 
 build-webapp:
-	@sh -c "'$(CURDIR)/scripts/build.sh' webapplication"
+	@sh -c "'$(CURDIR)/scripts/build-containers.sh' webapplication"
 
 build-tinkoffconnection:
-	@sh -c "'$(CURDIR)/scripts/build.sh' tinkoffinvestconnection"
+	@sh -c "'$(CURDIR)/scripts/build-containers.sh' tinkoffinvestconnection"
 
 build-migrator:
-	@sh -c "'$(CURDIR)/scripts/build.sh' migrator"
+	@sh -c "'$(CURDIR)/scripts/build-containers.sh' migrator"
 
 build-frontend:
-	@sh -c "'$(CURDIR)/scripts/build.sh' frontend"
+	@sh -c "'$(CURDIR)/scripts/build-containers.sh' frontend"
 
+### Stop Docker Containers ###
+stop:
+	docker-compose stop
+
+### Up Docker Containers ###
 up-postgresql:
 	docker-compose up -d postgresql
 
-up:
+up-all:
 	docker-compose up -d webapplication tinkoffinvestconnection postgresql
 
-stop:
-	docker-compose stop
+### Migration Commands ###
 
 migration-create:
 	docker-compose run --rm --entrypoint "" migrator make migration-create $(RUN_ARGS)
@@ -34,6 +39,7 @@ migration-up:
 migration-down:
 	docker-compose run --rm --entrypoint "" migrator make migration-down
 
+### Frontend Commands ###
 frontend-install:
 	docker-compose run --rm frontend yarn install
 
@@ -43,6 +49,7 @@ frontend-build:
 frontend-watch:
 	docker-compose run --rm frontend yarn watch
 
+### Up Application Local ###
 run-webapp:
 	go run cmd/webapplication/main.go
 
