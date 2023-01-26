@@ -1,27 +1,26 @@
 import { createRouter, createWebHistory } from "vue-router";
-import DashboardView from "../views/DashboardView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: "/",
-      name: "Dashboard",
-      component: DashboardView,
+      name: "Dashboard Statistic",
+      component: () => import("@/views/DashboardStatisticView.vue"),
     },
-    // {
-    //   path: "/profile",
-    //   name: "Profile",
-    //   component: () => import("../views/ProfileView.vue"),
-    // },
+    {
+      path: "/instruments",
+      name: "Instruments",
+      component: () => import("@/views/DashboardInstrumentsView.vue"),
+    },
     {
       path: "/logs",
       name: "Logs",
-      component: () => import("../views/LogsView.vue"),
+      component: () => import("@/views/DashboardLogsView.vue"),
     },
     {
       path: "/:pathMatch(.*)*",
-      component: () => import("../views/PageNotFound.vue"),
+      component: () => import("@/views/PageNotFoundView.vue"),
     },
   ],
 });

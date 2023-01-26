@@ -1,11 +1,11 @@
-<script setup>
-import { RouterView } from "vue-router";
-import HeaderPage from "@/components/layouts/HeaderPage.vue";
+<template>
+  <AppLayout />
+</template>
+
+<script setup lang="ts">
+import AppLayout from "@/components/AppLayout/AppLayout.vue";
 </script>
 
-<template>
-  <HeaderPage />
-  <main>
-    <RouterView />
-  </main>
-</template>
+<style lang="scss">
+@import "assets/sass/main.scss";
+</style>
