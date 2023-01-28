@@ -1,5 +1,5 @@
 <template>
-  <h1 class="uk-heading-line"><span>Dashboard</span></h1>
+  <h1 class="uk-heading-small">Dashboard</h1>
   <DashboardCommonMenu />
 </template>
 

@@ -1,6 +1,6 @@
 <template>
   <AppLayoutHeader />
-  <main class="uk-container uk-container-expand">
+  <main class="uk-container uk-container-expand uk-margin-large-bottom">
     <RouterView />
   </main>
   <AppLayoutSidebarMenu />
