@@ -4,7 +4,7 @@ import "time"
 
 type Currency struct {
 	Id                     int64     `gorm:"primarykey;column:id"`
-	Figi                   string    `gorm:"column:figi;type:varchar(255);not null"`
+	Figi                   string    `gorm:"column:figi;type:varchar(255);not null;unique"`
 	Ticker                 string    `gorm:"column:ticker;type:varchar(255);not null"`
 	ClassCode              string    `gorm:"column:class_code;type:varchar(255);not null"`
 	Isin                   string    `gorm:"column:isin;type:varchar(255);not null"`

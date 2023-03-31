@@ -38,6 +38,22 @@ type InstrumentApiHandler struct {
 	fillingHistoricalCandlesData        candles.FillingHistoricalCandlesDataInterface
 }
 
+func (iah InstrumentApiHandler) HandleGetSectors(ctx *gin.Context) {
+	instruments, err := iah.instrumentRepository.GetInstruments(ctx)
+	if err != nil {
+		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(err.Error()))
+		return
+	}
+
+	responseBody := iah.getInstrumentsBodyBuilder.CreateBody(instruments)
+	if err != nil {
+		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(err.Error()))
+		return
+	}
+
+	ctx.JSONP(http.StatusOK, iah.httpResponseBuilder.BuildSuccessResponse(responseBody))
+}
+
 func (iah InstrumentApiHandler) HandleGetInstruments(ctx *gin.Context) {
 	instruments, err := iah.instrumentRepository.GetInstruments(ctx)
 	if err != nil {

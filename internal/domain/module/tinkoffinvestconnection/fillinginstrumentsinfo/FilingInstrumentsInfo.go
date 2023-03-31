@@ -23,6 +23,6 @@ type FillingInstrumentsInfo struct {
 }
 
 func (fii FillingInstrumentsInfo) LoadInfo(ctx context.Context) {
-	fii.fillingSharesInfo.CheckExistAndLoadInfo(ctx)
-	fii.fillingCurrenciesInfo.CheckExistAndLoadInfo(ctx)
+	go fii.fillingSharesInfo.CreateInstrumentsIfNotExist(ctx)
+	go fii.fillingCurrenciesInfo.CreateInstrumentsIfNotExist(ctx)
 }

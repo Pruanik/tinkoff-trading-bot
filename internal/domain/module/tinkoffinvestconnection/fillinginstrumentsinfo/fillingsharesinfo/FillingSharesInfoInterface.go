@@ -3,5 +3,5 @@ package fillingsharesinfo
 import "context"
 
 type FillingSharesInfoInterface interface {
-	CheckExistAndLoadInfo(ctx context.Context)
+	CreateInstrumentsIfNotExist(ctx context.Context)
 }

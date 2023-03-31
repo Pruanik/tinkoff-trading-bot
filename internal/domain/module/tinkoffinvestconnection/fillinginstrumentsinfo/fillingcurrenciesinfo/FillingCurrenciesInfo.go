@@ -6,8 +6,12 @@ import (
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/module/tinkoffinvestconnection/tinkoffinvest"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/repository"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/grpc/investapi"
 	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
 )
+
+const currencySectorName string = "currency"
+const instrumentType string = "currency"
 
 func NewFillingCurrenciesInfo(
 	instrumentRepository repository.InstrumentRepositoryInterface,
@@ -30,55 +34,65 @@ type FillingCurrenciesInfo struct {
 	logger               log.LoggerInterface
 }
 
-func (fci FillingCurrenciesInfo) CheckExistAndLoadInfo(ctx context.Context) {
-	areCurrenciesExist, err := fci.instrumentRepository.AreInstrumentsExistByType(ctx, "currency")
+func (fci FillingCurrenciesInfo) CreateInstrumentsIfNotExist(ctx context.Context) {
+	currencies, err := fci.instrumentService.GetBaseCurrencies(ctx)
 	if err != nil {
 		return
 	}
 
-	if !areCurrenciesExist {
-		currencies, err := fci.instrumentService.GetBaseCurrencies(ctx)
-		if err != nil {
-			return
+	instruments := currencies.Instruments
+
+	for i := 0; i < len(instruments); i++ {
+		dbInstrument, _ := fci.instrumentRepository.GetInstrumentByFigi(ctx, instruments[i].Figi)
+		if dbInstrument != nil {
+			break
 		}
 
-		instruments := currencies.Instruments
+		fci.createInstrument(ctx, instruments[i])
+	}
+}
 
-		for i := 0; i < len(instruments); i++ {
-			instrument := model.NewInstrument(
-				instruments[i].GetFigi(),
-				instruments[i].GetName(),
-				"currency",
-			)
-			_, err = fci.instrumentRepository.Save(ctx, instrument)
-			if err != nil {
-				fci.logger.Error(log.LogCategoryLogic, err.Error(), map[string]interface{}{"service": "FillingCurrenciesInfo", "method": "CheckExistAndLoadInfo", "action": "save instrument"})
-			}
+func (fci FillingCurrenciesInfo) createInstrument(ctx context.Context, instrumentCurrency *investapi.Currency) {
+	instrument := model.NewInstrument(
+		instrumentCurrency.GetFigi(),
+		instrumentCurrency.GetName(),
+		currencySectorName,
+		instrumentType,
+	)
 
-			currency := model.NewCurrency(
-				instruments[i].GetFigi(),
-				instruments[i].GetTicker(),
-				instruments[i].GetClassCode(),
-				instruments[i].GetIsin(),
-				instruments[i].GetLot(),
-				instruments[i].GetCurrency(),
-				instruments[i].GetName(),
-				instruments[i].GetExchange(),
-				instruments[i].GetOtcFlag(),
-				instruments[i].GetBuyAvailableFlag(),
-				instruments[i].GetSellAvailableFlag(),
-				instruments[i].GetIsoCurrencyName(),
-				instruments[i].GetMinPriceIncrement().GetUnits(),
-				instruments[i].GetMinPriceIncrement().GetNano(),
-				instruments[i].GetApiTradeAvailableFlag(),
-			)
+	_, err := fci.instrumentRepository.Save(ctx, instrument)
+	if err != nil {
+		fci.logger.Error(
+			log.LogCategoryLogic,
+			err.Error(),
+			map[string]interface{}{"service": "FillingCurrenciesInfo", "method": "CreateInstrumentsIfNotExist", "action": "save instrument"},
+		)
+	}
 
-			_, err = fci.currenciesRepository.Save(ctx, currency)
-			if err != nil {
-				fci.logger.Error(log.LogCategoryLogic, err.Error(), map[string]interface{}{"service": "FillingCurrenciesInfo", "method": "CheckExistAndLoadInfo", "action": "save currency"})
-			}
-		}
-	} else {
-		fci.logger.Info(log.LogCategoryLogic, "Service does not need filling currencies", make(map[string]interface{}))
+	currency := model.NewCurrency(
+		instrumentCurrency.GetFigi(),
+		instrumentCurrency.GetTicker(),
+		instrumentCurrency.GetClassCode(),
+		instrumentCurrency.GetIsin(),
+		instrumentCurrency.GetLot(),
+		instrumentCurrency.GetCurrency(),
+		instrumentCurrency.GetName(),
+		instrumentCurrency.GetExchange(),
+		instrumentCurrency.GetOtcFlag(),
+		instrumentCurrency.GetBuyAvailableFlag(),
+		instrumentCurrency.GetSellAvailableFlag(),
+		instrumentCurrency.GetIsoCurrencyName(),
+		instrumentCurrency.GetMinPriceIncrement().GetUnits(),
+		instrumentCurrency.GetMinPriceIncrement().GetNano(),
+		instrumentCurrency.GetApiTradeAvailableFlag(),
+	)
+
+	_, err = fci.currenciesRepository.Save(ctx, currency)
+	if err != nil {
+		fci.logger.Error(
+			log.LogCategoryLogic,
+			err.Error(),
+			map[string]interface{}{"service": "FillingCurrenciesInfo", "method": "CreateInstrumentsIfNotExist", "action": "save currency"},
+		)
 	}
 }

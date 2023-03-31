@@ -1,19 +1,16 @@
 <template>
   <ul uk-tab>
-    <li>
-      <RouterLink activeClass="uk-active" to="/"> Statistic </RouterLink>
-    </li>
-    <li>
-      <RouterLink activeClass="uk-active" to="/instruments">
-        Instruments
-      </RouterLink>
-    </li>
-    <li>
-      <RouterLink activeClass="uk-active" to="/logs"> Logs </RouterLink>
-    </li>
+    <DashboardCommonMenuLink activeClass="uk-active" to="/"> Statistic </DashboardCommonMenuLink>
+    <DashboardCommonMenuLink activeClass="uk-active" to="/instruments">
+      Instruments
+    </DashboardCommonMenuLink>
+    <DashboardCommonMenuLink activeClass="uk-active" to="/logs">
+      Logs
+    </DashboardCommonMenuLink>
   </ul>
 </template>
 
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
+import DashboardCommonMenuLink from "./DashboardCommonMenuLink.vue";
 </script>

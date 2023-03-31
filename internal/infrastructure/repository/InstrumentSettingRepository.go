@@ -2,12 +2,14 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/repository"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/database"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/database/mapping"
 	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
+	"gorm.io/gorm"
 )
 
 func NewInstrumentSettingRepository(db database.DatabaseInterface, logger log.LoggerInterface) repository.InstrumentSettingRepositoryInterface {
@@ -32,10 +34,13 @@ func (isr *InstrumentSettingRepository) Save(ctx context.Context, instrumentSett
 
 func (isr *InstrumentSettingRepository) GetInstrumentSettingByFigi(ctx context.Context, figi string) (*model.InstrumentSetting, error) {
 	var instrumentSetting model.InstrumentSetting
+	res := isr.db.GetConnection().Model(&mapping.InstrumentSetting{}).Where("figi = ?", figi).Take(&instrumentSetting)
 
-	res := isr.db.GetConnection().Model(&mapping.InstrumentSetting{}).Where("figi = ?", figi).Find(&instrumentSetting)
 	if res.Error != nil {
-		isr.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
+		if !errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			isr.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
+		}
+
 		return nil, res.Error
 	}
 
@@ -43,13 +48,9 @@ func (isr *InstrumentSettingRepository) GetInstrumentSettingByFigi(ctx context.C
 }
 
 func (isr *InstrumentSettingRepository) Update(ctx context.Context, instrumentSetting *model.InstrumentSetting) (*model.InstrumentSetting, error) {
-	instrumentSettingInDb, err := isr.GetInstrumentSettingByFigi(ctx, instrumentSetting.Figi)
-	if err != nil {
-		isr.logger.Error(log.LogCategoryDatabase, err.Error(), make(map[string]interface{}))
-		return nil, err
-	}
+	instrumentSettingInDb, _ := isr.GetInstrumentSettingByFigi(ctx, instrumentSetting.Figi)
 
-	if instrumentSettingInDb.Id == 0 {
+	if instrumentSettingInDb == nil {
 		isr.Save(ctx, instrumentSetting)
 	} else {
 		isr.db.GetConnection().Model(&mapping.InstrumentSetting{}).Where("figi = ?", instrumentSetting.Figi).Update("is_data_collecting", instrumentSetting.IsDataCollecting)

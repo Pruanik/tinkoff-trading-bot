@@ -9,9 +9,11 @@ import (
 type InstrumentRepositoryInterface interface {
 	Save(ctx context.Context, instrument *model.Instrument) (*model.Instrument, error)
 
+	GetSectors(ctx context.Context) ([]string, error)
+
 	GetInstruments(ctx context.Context) ([]model.Instrument, error)
 
 	GetInstrumentsByType(ctx context.Context, instrumentType string) ([]model.Instrument, error)
 
-	AreInstrumentsExistByType(ctx context.Context, instrumentType string) (bool, error)
+	GetInstrumentByFigi(ctx context.Context, instrumentFigi string) (*model.Instrument, error)
 }

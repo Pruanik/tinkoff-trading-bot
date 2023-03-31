@@ -2,12 +2,14 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/repository"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/database"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/database/mapping"
 	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
+	"gorm.io/gorm"
 )
 
 func NewInstrumentRepository(db database.DatabaseInterface, logger log.LoggerInterface) repository.InstrumentRepositoryInterface {
@@ -28,6 +30,18 @@ func (ir *InstrumentRepository) Save(ctx context.Context, instrument *model.Inst
 	}
 
 	return instrument, nil
+}
+
+func (ir *InstrumentRepository) GetSectors(ctx context.Context) ([]string, error) {
+	var sectors []string
+
+	res := ir.db.GetConnection().Model(&mapping.Instrument{}).Distinct("sector").Order("sector").Find(&sectors)
+	if res.Error != nil {
+		ir.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
+		return nil, res.Error
+	}
+
+	return sectors, nil
 }
 
 func (ir *InstrumentRepository) GetInstruments(ctx context.Context) ([]model.Instrument, error) {
@@ -54,13 +68,17 @@ func (ir *InstrumentRepository) GetInstrumentsByType(ctx context.Context, instru
 	return instruments, nil
 }
 
-func (ir *InstrumentRepository) AreInstrumentsExistByType(ctx context.Context, instrumentType string) (bool, error) {
-	var instruments []model.Instrument
-	err := ir.db.GetConnection().Model(&mapping.Instrument{}).Where("type = ?", instrumentType).Limit(1).Find(&instruments).Error
-	if err != nil {
-		ir.logger.Error(log.LogCategoryDatabase, err.Error(), make(map[string]interface{}))
-		return false, err
+func (ir *InstrumentRepository) GetInstrumentByFigi(ctx context.Context, instrumentFigi string) (*model.Instrument, error) {
+	var instrument model.Instrument
+	res := ir.db.GetConnection().Model(&mapping.Instrument{}).Where("figi = ?", instrumentFigi).Take(&instrument)
+
+	if res.Error != nil {
+		if !errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			ir.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
+		}
+
+		return nil, res.Error
 	}
 
-	return len(instruments) > 0, nil
+	return &instrument, nil
 }
