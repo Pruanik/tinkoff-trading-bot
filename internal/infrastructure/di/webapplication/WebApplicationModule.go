@@ -38,15 +38,15 @@ func (wam WebApplicationModule) BuildOptions(config *configs.Config) fx.Option {
 			apiHandler.NewInstrumentApiHandler,
 			apiHandler.NewSystemApiHandler,
 			apiHandler.NewCandleApiHandler,
-			repository.NewInstrumentRepository,
 			repository.NewLogRepository,
-			repository.NewInstrumentSettingRepository,
-			repository.NewCandleRepository,
 			builder.NewHttpResponseBuilder,
 			builder.NewGetInstrumentsBodyBuilder,
+			builder.NewGetInstrumentSectorsBodyBuilder,
 			builder.NewGetLogsBodyBuilder,
 			builder.NewGetCollectingInstrumentsBodyBuilder,
 			builder.NewGetCandlesChartBodyBuilder,
+
+			// refactoring
 			grpc.NewGrpcConnection,
 			investapi.NewMarketDataServiceClient,
 			tinkoffinvest.NewMarketDataService,

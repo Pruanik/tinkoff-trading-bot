@@ -32,18 +32,6 @@ func (ir *InstrumentRepository) Save(ctx context.Context, instrument *model.Inst
 	return instrument, nil
 }
 
-func (ir *InstrumentRepository) GetSectors(ctx context.Context) ([]string, error) {
-	var sectors []string
-
-	res := ir.db.GetConnection().Model(&mapping.Instrument{}).Distinct("sector").Order("sector").Find(&sectors)
-	if res.Error != nil {
-		ir.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
-		return nil, res.Error
-	}
-
-	return sectors, nil
-}
-
 func (ir *InstrumentRepository) GetInstruments(ctx context.Context) ([]model.Instrument, error) {
 	var instruments []model.Instrument
 

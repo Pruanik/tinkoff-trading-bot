@@ -33,14 +33,13 @@ func (tic TinkoffInvestConnectionModule) BuildOptions(config *configs.Config) fx
 			investapi.NewUsersServiceClient,
 			tinkoffinvest.NewInstrumentService,
 			tinkoffinvest.NewMarketDataService,
-			repository.NewInstrumentRepository,
-			repository.NewInstrumentSettingRepository,
 			repository.NewShareRepository,
 			repository.NewCurrencyRepository,
-			repository.NewCandleRepository,
 			fillingcurrenciesinfo.NewFillingCurrenciesInfo,
 			fillingsharesinfo.NewFillingSharesInfo,
 			fillinginstrumentsinfo.NewFillingInstrumentsInfo,
+
+			// refactoring
 			candles.NewFillingHistoricalCandlesData,
 		),
 		fx.Invoke(

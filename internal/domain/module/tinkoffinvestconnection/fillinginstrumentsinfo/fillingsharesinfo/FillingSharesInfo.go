@@ -6,6 +6,7 @@ import (
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/module/tinkoffinvestconnection/tinkoffinvest"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/repository"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/service"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/grpc/investapi"
 	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
 )
@@ -13,24 +14,27 @@ import (
 const instrumentType string = "share"
 
 func NewFillingSharesInfo(
+	instrumentSectorService service.InstrumentSectorServiceInterface,
 	instrumentRepository repository.InstrumentRepositoryInterface,
 	shareRepository repository.ShareRepositoryInterface,
 	instrumentService tinkoffinvest.InstrumentServiceInterface,
 	logger log.LoggerInterface,
 ) FillingSharesInfoInterface {
 	return &FillingSharesInfo{
-		instrumentRepository: instrumentRepository,
-		shareRepository:      shareRepository,
-		instrumentService:    instrumentService,
-		logger:               logger,
+		instrumentSectorService: instrumentSectorService,
+		instrumentRepository:    instrumentRepository,
+		shareRepository:         shareRepository,
+		instrumentService:       instrumentService,
+		logger:                  logger,
 	}
 }
 
 type FillingSharesInfo struct {
-	instrumentRepository repository.InstrumentRepositoryInterface
-	shareRepository      repository.ShareRepositoryInterface
-	instrumentService    tinkoffinvest.InstrumentServiceInterface
-	logger               log.LoggerInterface
+	instrumentSectorService service.InstrumentSectorServiceInterface
+	instrumentRepository    repository.InstrumentRepositoryInterface
+	shareRepository         repository.ShareRepositoryInterface
+	instrumentService       tinkoffinvest.InstrumentServiceInterface
+	logger                  log.LoggerInterface
 }
 
 func (fsi FillingSharesInfo) CreateInstrumentsIfNotExist(ctx context.Context) {
@@ -47,28 +51,60 @@ func (fsi FillingSharesInfo) CreateInstrumentsIfNotExist(ctx context.Context) {
 			break
 		}
 
-		fsi.createInstrument(ctx, instruments[i])
+		fsi.createInstrumentShare(ctx, instruments[i])
 	}
 }
 
-func (fsi FillingSharesInfo) createInstrument(ctx context.Context, instrumentShare *investapi.Share) {
-	instrument := model.NewInstrument(
-		instrumentShare.GetFigi(),
-		instrumentShare.GetName(),
-		instrumentShare.GetSector(),
-		instrumentType,
-	)
-
-	_, err := fsi.instrumentRepository.Save(ctx, instrument)
-	if err != nil {
+func (fsi FillingSharesInfo) createInstrumentShare(ctx context.Context, instrumentShare *investapi.Share) {
+	sector, sectorErr := fsi.createSector(ctx, instrumentShare.GetSector())
+	if sectorErr != nil {
 		fsi.logger.Error(
 			log.LogCategoryLogic,
-			err.Error(),
-			map[string]interface{}{"service": "FillingSharesInfo", "method": "CreateInstrumentsIfNotExist", "action": "save instrument"},
+			sectorErr.Error(),
+			map[string]interface{}{"service": "FillingSharesInfo", "method": "createSector", "action": "save sector"},
+		)
+		return
+	}
+
+	_, instrumentErr := fsi.createInstrument(ctx, instrumentShare, sector)
+	if instrumentErr != nil {
+		fsi.logger.Error(
+			log.LogCategoryLogic,
+			instrumentErr.Error(),
+			map[string]interface{}{"service": "FillingSharesInfo", "method": "createInstrument", "action": "save instrument"},
 		)
 	}
 
-	share := model.NewShare(
+	_, shareErr := fsi.createShare(ctx, instrumentShare)
+	if shareErr != nil {
+		fsi.logger.Error(
+			log.LogCategoryLogic,
+			shareErr.Error(),
+			map[string]interface{}{"service": "FillingSharesInfo", "method": "createShare", "action": "save share"},
+		)
+	}
+}
+
+func (fsi FillingSharesInfo) createSector(ctx context.Context, code string) (*model.InstrumentSector, error) {
+	return fsi.instrumentSectorService.CreateIfNotExist(ctx, code)
+}
+
+func (fsi FillingSharesInfo) createInstrument(
+	ctx context.Context,
+	instrumentShare *investapi.Share,
+	instrumentSector *model.InstrumentSector,
+) (*model.Instrument, error) {
+	newInstrument := model.NewInstrument(
+		instrumentShare.GetFigi(),
+		instrumentShare.GetName(),
+		instrumentSector.Id,
+		instrumentType,
+	)
+	return fsi.instrumentRepository.Save(ctx, newInstrument)
+}
+
+func (fsi FillingSharesInfo) createShare(ctx context.Context, instrumentShare *investapi.Share) (*model.Share, error) {
+	newShare := model.NewShare(
 		instrumentShare.GetFigi(),
 		instrumentShare.GetTicker(),
 		instrumentShare.GetClassCode(),
@@ -77,18 +113,10 @@ func (fsi FillingSharesInfo) createInstrument(ctx context.Context, instrumentSha
 		instrumentShare.GetCurrency(),
 		instrumentShare.GetName(),
 		instrumentShare.GetExchange(),
-		instrumentShare.GetSector(),
 		instrumentShare.GetMinPriceIncrement().GetUnits(),
 		instrumentShare.GetMinPriceIncrement().GetNano(),
 		instrumentShare.GetApiTradeAvailableFlag(),
 	)
 
-	_, err = fsi.shareRepository.Save(ctx, share)
-	if err != nil {
-		fsi.logger.Error(
-			log.LogCategoryLogic,
-			err.Error(),
-			map[string]interface{}{"service": "FillingSharesInfo", "method": "CreateInstrumentsIfNotExist", "action": "save share"},
-		)
-	}
+	return fsi.shareRepository.Save(ctx, newShare)
 }

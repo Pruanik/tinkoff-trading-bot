@@ -12,7 +12,6 @@ type Share struct {
 	Currency               string
 	Name                   string
 	Exchange               string
-	Sector                 string
 	MinPriceIncrementUnits int64
 	MinPriceIncrementNano  int32
 	ApiTradeAvailableFlag  bool
@@ -29,7 +28,6 @@ func NewShare(
 	currency string,
 	name string,
 	exchange string,
-	sector string,
 	minPriceIncrementUnits int64,
 	minPriceIncrementNano int32,
 	apiTradeAvailableFlag bool,
@@ -43,13 +41,8 @@ func NewShare(
 		Currency:               currency,
 		Name:                   name,
 		Exchange:               exchange,
-		Sector:                 sector,
 		MinPriceIncrementUnits: minPriceIncrementUnits,
 		MinPriceIncrementNano:  minPriceIncrementNano,
 		ApiTradeAvailableFlag:  apiTradeAvailableFlag,
 	}
-}
-
-func (s *Share) TableName() string {
-	return "shares"
 }

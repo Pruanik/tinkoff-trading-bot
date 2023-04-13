@@ -28,13 +28,13 @@ type ApiRouter struct {
 }
 
 func (ar *ApiRouter) Create(router *gin.Engine) {
-	apiRouterGroup := router.Group("/api/")
-	apiRouterGroup.GET("/getLogs", ar.logApiHandler.Handle)
-	apiRouterGroup.GET("/getSectors", ar.instrumentApiHandler.HandleGetSectors)
-	apiRouterGroup.GET("/getInstruments", ar.instrumentApiHandler.HandleGetInstruments)
-	apiRouterGroup.GET("/getCollectingInstruments", ar.instrumentApiHandler.HandleGetCollectingInstruments)
-	apiRouterGroup.GET("/setCollectingInstrument", ar.instrumentApiHandler.HandleSetCollectingInstrument)
-	apiRouterGroup.GET("/getMod", ar.systemApiHandler.HandleGetMod)
-	apiRouterGroup.GET("/getPeriodCandles", ar.candleApiHandler.HandleGetPeriodCandles)
-	apiRouterGroup.GET("/getLastCandles", ar.candleApiHandler.HandleGetLastCandles)
+	apiRouterGroup := router.Group("/api/v1/")
+	apiRouterGroup.GET("/log", ar.logApiHandler.Handle)
+	apiRouterGroup.GET("/instruments", ar.instrumentApiHandler.HandleGetInstruments)
+	apiRouterGroup.GET("/instruments/sectors", ar.instrumentApiHandler.HandleGetSectors)
+	// apiRouterGroup.GET("/getCollectingInstruments", ar.instrumentApiHandler.HandleGetCollectingInstruments)
+	// apiRouterGroup.GET("/setCollectingInstrument", ar.instrumentApiHandler.HandleSetCollectingInstrument)
+	// apiRouterGroup.GET("/getMod", ar.systemApiHandler.HandleGetMod)
+	// apiRouterGroup.GET("/getPeriodCandles", ar.candleApiHandler.HandleGetPeriodCandles)
+	// apiRouterGroup.GET("/getLastCandles", ar.candleApiHandler.HandleGetLastCandles)
 }

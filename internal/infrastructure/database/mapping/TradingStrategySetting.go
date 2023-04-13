@@ -4,5 +4,5 @@ type TradingStrategySetting struct {
 }
 
 func (tss *TradingStrategySetting) TableName() string {
-	return "trading_strategy_setting"
+	return "trading_strategy_settings"
 }

@@ -58,7 +58,3 @@ func NewCurrency(
 		ApiTradeAvailableFlag:  apiTradeAvailableFlag,
 	}
 }
-
-func (c *Currency) TableName() string {
-	return "currencies"
-}

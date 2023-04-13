@@ -9,7 +9,6 @@ create table if not exists shares
 	currency                  varchar   not null,
 	name                      varchar   not null,
 	exchange                  varchar   not null,
-	sector                    varchar   not null,
 	min_price_increment_units bigint    not null,
 	min_price_increment_nano  integer   not null,
 	api_trade_available_flag  boolean   not null,

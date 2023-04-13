@@ -14,7 +14,3 @@ type Log struct {
 func NewLogModel(category string, level string, context []byte) *Log {
 	return &Log{Category: category, Level: level, Context: context}
 }
-
-func (l *Log) TableName() string {
-	return "logs"
-}

@@ -4,7 +4,7 @@ create table if not exists instrument_settings
     figi                         varchar   not null,
     is_data_collecting           boolean   not null default false,
 	created_at                   timestamp not null,
-	updated_at                    timestamp not null
+	updated_at                   timestamp not null
 );
 
 create unique index if not exists i_instrument_settings_figi

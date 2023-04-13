@@ -37,7 +37,3 @@ func NewCandle(
 		Timestamp: timestamp,
 	}
 }
-
-func (c *Candle) TableName() string {
-	return "candles"
-}

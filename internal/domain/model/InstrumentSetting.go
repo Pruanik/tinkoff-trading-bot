@@ -13,7 +13,3 @@ type InstrumentSetting struct {
 func NewInstrumentSetting(figi string, isDataCollecting bool) *InstrumentSetting {
 	return &InstrumentSetting{Figi: figi, IsDataCollecting: isDataCollecting}
 }
-
-func (is *InstrumentSetting) TableName() string {
-	return "instrument_settings"
-}

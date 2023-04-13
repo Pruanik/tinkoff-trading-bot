@@ -14,16 +14,20 @@ import (
 func NewInstrumentApiHandler(
 	httpResponseBuilder builder.HttpResponseBuilderInterface,
 	instrumentRepository repository.InstrumentRepositoryInterface,
+	instrumentSectorRepository repository.InstrumentSectorRepositoryInterface,
 	instrumentSettingRepository repository.InstrumentSettingRepositoryInterface,
 	getInstrumentsBodyBuilder builder.GetInstrumentsBodyBuilderInterface,
+	getInstrumentSectorsBodyBuilder builder.GetInstrumentSectorsBodyBuilderInterface,
 	getCollectingInstrumentsBodyBuilder builder.GetCollectingInstrumentsBodyBuilderInterface,
 	fillingHistoricalCandlesData candles.FillingHistoricalCandlesDataInterface,
 ) *InstrumentApiHandler {
 	return &InstrumentApiHandler{
 		httpResponseBuilder:                 httpResponseBuilder,
 		instrumentRepository:                instrumentRepository,
+		instrumentSectorRepository:          instrumentSectorRepository,
 		instrumentSettingRepository:         instrumentSettingRepository,
 		getInstrumentsBodyBuilder:           getInstrumentsBodyBuilder,
+		getInstrumentSectorsBodyBuilder:     getInstrumentSectorsBodyBuilder,
 		getCollectingInstrumentsBodyBuilder: getCollectingInstrumentsBodyBuilder,
 		fillingHistoricalCandlesData:        fillingHistoricalCandlesData,
 	}
@@ -32,20 +36,22 @@ func NewInstrumentApiHandler(
 type InstrumentApiHandler struct {
 	httpResponseBuilder                 builder.HttpResponseBuilderInterface
 	instrumentRepository                repository.InstrumentRepositoryInterface
+	instrumentSectorRepository          repository.InstrumentSectorRepositoryInterface
 	instrumentSettingRepository         repository.InstrumentSettingRepositoryInterface
 	getInstrumentsBodyBuilder           builder.GetInstrumentsBodyBuilderInterface
+	getInstrumentSectorsBodyBuilder     builder.GetInstrumentSectorsBodyBuilderInterface
 	getCollectingInstrumentsBodyBuilder builder.GetCollectingInstrumentsBodyBuilderInterface
 	fillingHistoricalCandlesData        candles.FillingHistoricalCandlesDataInterface
 }
 
 func (iah InstrumentApiHandler) HandleGetSectors(ctx *gin.Context) {
-	instruments, err := iah.instrumentRepository.GetInstruments(ctx)
+	instrumentSectors, err := iah.instrumentSectorRepository.GetSectors(ctx)
 	if err != nil {
 		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(err.Error()))
 		return
 	}
 
-	responseBody := iah.getInstrumentsBodyBuilder.CreateBody(instruments)
+	responseBody := iah.getInstrumentSectorsBodyBuilder.CreateBody(instrumentSectors)
 	if err != nil {
 		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(err.Error()))
 		return

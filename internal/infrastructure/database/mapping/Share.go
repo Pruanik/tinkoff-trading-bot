@@ -12,7 +12,6 @@ type Share struct {
 	Currency               string    `gorm:"column:currency;type:varchar(255);not null"`
 	Name                   string    `gorm:"column:name;type:varchar(255);not null"`
 	Exchange               string    `gorm:"column:exchange;type:varchar(255);not null"`
-	Sector                 string    `gorm:"column:sector;type:varchar(255);not null"`
 	MinPriceIncrementUnits int64     `gorm:"column:min_price_increment_units;not null"`
 	MinPriceIncrementNano  int32     `gorm:"column:min_price_increment_nano;not null"`
 	ApiTradeAvailableFlag  bool      `gorm:"column:api_trade_available_flag;not null"`
