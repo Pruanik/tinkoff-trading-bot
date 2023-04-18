@@ -24,6 +24,7 @@ func (cm CommonModule) BuildOptions(config *configs.Config) fx.Option {
 			repository.NewInstrumentSettingRepository,
 			repository.NewInstrumentSectorRepository,
 			repository.NewCandleRepository,
+			repository.NewLogRepository,
 
 			service.NewInstrumentSectorService,
 		),

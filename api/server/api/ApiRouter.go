@@ -32,6 +32,7 @@ func (ar *ApiRouter) Create(router *gin.Engine) {
 	apiRouterGroup.GET("/log", ar.logApiHandler.Handle)
 	apiRouterGroup.GET("/instruments", ar.instrumentApiHandler.HandleGetInstruments)
 	apiRouterGroup.GET("/instruments/sectors", ar.instrumentApiHandler.HandleGetSectors)
+	apiRouterGroup.GET("/instruments/types", ar.instrumentApiHandler.HandleGetTypes)
 	// apiRouterGroup.GET("/getCollectingInstruments", ar.instrumentApiHandler.HandleGetCollectingInstruments)
 	// apiRouterGroup.GET("/setCollectingInstrument", ar.instrumentApiHandler.HandleSetCollectingInstrument)
 	// apiRouterGroup.GET("/getMod", ar.systemApiHandler.HandleGetMod)

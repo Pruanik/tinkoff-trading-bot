@@ -3,23 +3,35 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/repository"
+	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
 )
 
-func NewInstrumentSectorService(instrumentSectorRepository repository.InstrumentSectorRepositoryInterface) InstrumentSectorServiceInterface {
-	return &InstrumentSectorService{instrumentSectorRepository: instrumentSectorRepository}
+const defaultSectorCode string = "other"
+
+func NewInstrumentSectorService(
+	instrumentSectorRepository repository.InstrumentSectorRepositoryInterface,
+	logger log.LoggerInterface,
+) InstrumentSectorServiceInterface {
+	return &InstrumentSectorService{
+		instrumentSectorRepository: instrumentSectorRepository,
+		logger:                     logger,
+	}
 }
 
 type InstrumentSectorService struct {
 	instrumentSectorRepository repository.InstrumentSectorRepositoryInterface
+	logger                     log.LoggerInterface
 }
 
 func (iss *InstrumentSectorService) Create(ctx context.Context, code string) (*model.InstrumentSector, error) {
 	sectorName, err := iss.getSectorName(ctx, code)
 	if err != nil {
-		sectorName = code
+		code = defaultSectorCode
+		sectorName, _ = iss.getSectorName(ctx, defaultSectorCode)
 	}
 
 	newInstrumentSector := model.NewInstrumentSector(code, sectorName)
@@ -61,6 +73,13 @@ func (iss *InstrumentSectorService) getSectorName(ctx context.Context, code stri
 	if value, ok := codeMap[code]; ok {
 		return value, nil
 	} else {
-		return "", errors.New("the code doesn't exist in the map")
+		message := fmt.Sprintf("the code: `%s` doesn't exist in the codeMap", code)
+		iss.logger.Error(
+			log.LogCategoryLogic,
+			message,
+			map[string]interface{}{"service": "InstrumentSectorService", "method": "getSectorName", "action": "convert sector code to name"},
+		)
+
+		return "", errors.New(message)
 	}
 }

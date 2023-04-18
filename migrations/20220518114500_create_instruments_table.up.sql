@@ -1,3 +1,4 @@
+drop type if exists instrument_type;
 create type instrument_type as enum ('bond', 'currency', 'etf', 'future', 'share');
 
 create table if not exists instruments

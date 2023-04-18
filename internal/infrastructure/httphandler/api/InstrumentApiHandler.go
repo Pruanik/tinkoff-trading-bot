@@ -1,7 +1,6 @@
 package api
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/builder"
@@ -18,6 +17,7 @@ func NewInstrumentApiHandler(
 	instrumentSettingRepository repository.InstrumentSettingRepositoryInterface,
 	getInstrumentsBodyBuilder builder.GetInstrumentsBodyBuilderInterface,
 	getInstrumentSectorsBodyBuilder builder.GetInstrumentSectorsBodyBuilderInterface,
+	getInstrumentTypesBodyBuilder builder.GetInstrumentTypesBodyBuilderInterface,
 	getCollectingInstrumentsBodyBuilder builder.GetCollectingInstrumentsBodyBuilderInterface,
 	fillingHistoricalCandlesData candles.FillingHistoricalCandlesDataInterface,
 ) *InstrumentApiHandler {
@@ -28,6 +28,7 @@ func NewInstrumentApiHandler(
 		instrumentSettingRepository:         instrumentSettingRepository,
 		getInstrumentsBodyBuilder:           getInstrumentsBodyBuilder,
 		getInstrumentSectorsBodyBuilder:     getInstrumentSectorsBodyBuilder,
+		getInstrumentTypesBodyBuilder:       getInstrumentTypesBodyBuilder,
 		getCollectingInstrumentsBodyBuilder: getCollectingInstrumentsBodyBuilder,
 		fillingHistoricalCandlesData:        fillingHistoricalCandlesData,
 	}
@@ -40,6 +41,7 @@ type InstrumentApiHandler struct {
 	instrumentSettingRepository         repository.InstrumentSettingRepositoryInterface
 	getInstrumentsBodyBuilder           builder.GetInstrumentsBodyBuilderInterface
 	getInstrumentSectorsBodyBuilder     builder.GetInstrumentSectorsBodyBuilderInterface
+	getInstrumentTypesBodyBuilder       builder.GetInstrumentTypesBodyBuilderInterface
 	getCollectingInstrumentsBodyBuilder builder.GetCollectingInstrumentsBodyBuilderInterface
 	fillingHistoricalCandlesData        candles.FillingHistoricalCandlesDataInterface
 }
@@ -60,8 +62,47 @@ func (iah InstrumentApiHandler) HandleGetSectors(ctx *gin.Context) {
 	ctx.JSONP(http.StatusOK, iah.httpResponseBuilder.BuildSuccessResponse(responseBody))
 }
 
+func (iah InstrumentApiHandler) HandleGetTypes(ctx *gin.Context) {
+	sectorId := iah.getQueryParams(ctx, "sectorId")
+	var instrumentTypes []string
+	var err error
+
+	if sectorId != nil {
+		instrumentTypes, err = iah.instrumentRepository.GetInstrumentTypesBySectorId(ctx, *sectorId)
+	} else {
+		instrumentTypes, err = iah.instrumentRepository.GetInstrumentTypes(ctx)
+	}
+
+	if err != nil {
+		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(err.Error()))
+		return
+	}
+
+	responseBody := iah.getInstrumentTypesBodyBuilder.CreateBody(instrumentTypes)
+	if err != nil {
+		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(err.Error()))
+		return
+	}
+
+	ctx.JSONP(http.StatusOK, iah.httpResponseBuilder.BuildSuccessResponse(responseBody))
+}
+
 func (iah InstrumentApiHandler) HandleGetInstruments(ctx *gin.Context) {
-	instruments, err := iah.instrumentRepository.GetInstruments(ctx)
+	sectorId := iah.getQueryParams(ctx, "sectorId")
+	typeName := iah.getQueryParams(ctx, "type")
+	var instruments []model.Instrument
+	var err error
+
+	if sectorId != nil && typeName != nil {
+		instruments, err = iah.instrumentRepository.GetInstrumentsBySectorIdAndType(ctx, *sectorId, *typeName)
+	} else if sectorId != nil {
+		instruments, err = iah.instrumentRepository.GetInstrumentsBySectorId(ctx, *sectorId)
+	} else if typeName != nil {
+		instruments, err = iah.instrumentRepository.GetInstrumentsByType(ctx, *typeName)
+	} else {
+		instruments, err = iah.instrumentRepository.GetInstruments(ctx)
+	}
+
 	if err != nil {
 		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(err.Error()))
 		return
@@ -92,37 +133,32 @@ func (iah InstrumentApiHandler) HandleGetCollectingInstruments(ctx *gin.Context)
 	ctx.JSONP(http.StatusOK, iah.httpResponseBuilder.BuildSuccessResponse(responseBody))
 }
 
-func (iah InstrumentApiHandler) HandleSetCollectingInstrument(ctx *gin.Context) {
-	figi, status, err := iah.getSetCollectingInstrumentParams(ctx)
+// func (iah InstrumentApiHandler) HandleSetCollectingInstrument(ctx *gin.Context) {
+// 	figi, status, err := iah.getSetCollectingInstrumentParams(ctx)
 
-	if err != nil {
-		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(err.Error()))
-		return
+// 	if err != nil {
+// 		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(err.Error()))
+// 		return
+// 	}
+
+// 	instrumentSetting := model.NewInstrumentSetting(*figi, *status)
+// 	_, saveError := iah.instrumentSettingRepository.Update(ctx, instrumentSetting)
+// 	if saveError != nil {
+// 		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(saveError.Error()))
+// 		return
+// 	}
+// 	iah.fillingHistoricalCandlesData.FillingHistoricalDataByFigi(ctx, *figi)
+
+// 	ctx.JSONP(http.StatusOK, iah.httpResponseBuilder.BuildSuccessResponse(nil))
+// }
+
+func (iah InstrumentApiHandler) getQueryParams(ctx *gin.Context, paramKey string) *string {
+	paramValue, isParamExist := ctx.GetQuery(paramKey)
+
+	var result *string
+	if isParamExist {
+		result = &paramValue
 	}
 
-	instrumentSetting := model.NewInstrumentSetting(*figi, *status)
-	_, saveError := iah.instrumentSettingRepository.Update(ctx, instrumentSetting)
-	if saveError != nil {
-		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(saveError.Error()))
-		return
-	}
-	iah.fillingHistoricalCandlesData.FillingHistoricalDataByFigi(ctx, *figi)
-
-	ctx.JSONP(http.StatusOK, iah.httpResponseBuilder.BuildSuccessResponse(nil))
-}
-
-func (iah InstrumentApiHandler) getSetCollectingInstrumentParams(ctx *gin.Context) (*string, *bool, error) {
-	figi, existFigi := ctx.GetQuery("figi")
-	statusQuery, existStatus := ctx.GetQuery("status")
-
-	if !existFigi {
-		return nil, nil, errors.New("Figi param does not exist.")
-	}
-
-	status := false
-	if existStatus && statusQuery == "true" {
-		status = true
-	}
-
-	return &figi, &status, nil
+	return result
 }

@@ -17,7 +17,6 @@ import (
 	apiHandler "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/httphandler/api"
 	webHandler "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/httphandler/web"
 	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
-	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/repository"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/tinkoffinvest"
 	"go.uber.org/fx"
 )
@@ -38,10 +37,10 @@ func (wam WebApplicationModule) BuildOptions(config *configs.Config) fx.Option {
 			apiHandler.NewInstrumentApiHandler,
 			apiHandler.NewSystemApiHandler,
 			apiHandler.NewCandleApiHandler,
-			repository.NewLogRepository,
 			builder.NewHttpResponseBuilder,
 			builder.NewGetInstrumentsBodyBuilder,
 			builder.NewGetInstrumentSectorsBodyBuilder,
+			builder.NewGetInstrumentTypesBodyBuilder,
 			builder.NewGetLogsBodyBuilder,
 			builder.NewGetCollectingInstrumentsBodyBuilder,
 			builder.NewGetCandlesChartBodyBuilder,

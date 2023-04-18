@@ -56,6 +56,30 @@ func (ir *InstrumentRepository) GetInstrumentsByType(ctx context.Context, instru
 	return instruments, nil
 }
 
+func (ir *InstrumentRepository) GetInstrumentsBySectorId(ctx context.Context, sectorId string) ([]model.Instrument, error) {
+	var instruments []model.Instrument
+
+	res := ir.db.GetConnection().Model(&mapping.Instrument{}).Where("sector_id = ?", sectorId).Order("type, name").Find(&instruments)
+	if res.Error != nil {
+		ir.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
+		return nil, res.Error
+	}
+
+	return instruments, nil
+}
+
+func (ir *InstrumentRepository) GetInstrumentsBySectorIdAndType(ctx context.Context, sectorId string, instrumentType string) ([]model.Instrument, error) {
+	var instruments []model.Instrument
+
+	res := ir.db.GetConnection().Model(&mapping.Instrument{}).Where("sector_id = ? and type = ?", sectorId, instrumentType).Order("type, name").Find(&instruments)
+	if res.Error != nil {
+		ir.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
+		return nil, res.Error
+	}
+
+	return instruments, nil
+}
+
 func (ir *InstrumentRepository) GetInstrumentByFigi(ctx context.Context, instrumentFigi string) (*model.Instrument, error) {
 	var instrument model.Instrument
 	res := ir.db.GetConnection().Model(&mapping.Instrument{}).Where("figi = ?", instrumentFigi).Take(&instrument)
@@ -69,4 +93,28 @@ func (ir *InstrumentRepository) GetInstrumentByFigi(ctx context.Context, instrum
 	}
 
 	return &instrument, nil
+}
+
+func (ir *InstrumentRepository) GetInstrumentTypes(ctx context.Context) ([]string, error) {
+	var instrumentTypes []string
+
+	res := ir.db.GetConnection().Model(&mapping.Instrument{}).Distinct("type").Order("type").Find(&instrumentTypes)
+	if res.Error != nil {
+		ir.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
+		return nil, res.Error
+	}
+
+	return instrumentTypes, nil
+}
+
+func (ir *InstrumentRepository) GetInstrumentTypesBySectorId(ctx context.Context, sectorId string) ([]string, error) {
+	var instrumentTypes []string
+
+	res := ir.db.GetConnection().Model(&mapping.Instrument{}).Distinct("type").Where("sector_id = ?", sectorId).Order("type").Find(&instrumentTypes)
+	if res.Error != nil {
+		ir.logger.Error(log.LogCategoryDatabase, res.Error.Error(), make(map[string]interface{}))
+		return nil, res.Error
+	}
+
+	return instrumentTypes, nil
 }
