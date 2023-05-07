@@ -2,6 +2,7 @@ create table if not exists instrument_settings
 (
     id                           serial    primary key,
     figi                         varchar   not null,
+    is_observed                  boolean   not null default false,
     is_data_collecting           boolean   not null default false,
 	created_at                   timestamp not null,
 	updated_at                   timestamp not null

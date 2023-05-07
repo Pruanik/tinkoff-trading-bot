@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/httphandler/api"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/http/handler/api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -33,8 +33,8 @@ func (ar *ApiRouter) Create(router *gin.Engine) {
 	apiRouterGroup.GET("/instruments", ar.instrumentApiHandler.HandleGetInstruments)
 	apiRouterGroup.GET("/instruments/sectors", ar.instrumentApiHandler.HandleGetSectors)
 	apiRouterGroup.GET("/instruments/types", ar.instrumentApiHandler.HandleGetTypes)
+	apiRouterGroup.POST("/instruments/action/setInstrumentObservable", ar.instrumentApiHandler.HandleSetInstrumentObservable)
 	// apiRouterGroup.GET("/getCollectingInstruments", ar.instrumentApiHandler.HandleGetCollectingInstruments)
-	// apiRouterGroup.GET("/setCollectingInstrument", ar.instrumentApiHandler.HandleSetCollectingInstrument)
 	// apiRouterGroup.GET("/getMod", ar.systemApiHandler.HandleGetMod)
 	// apiRouterGroup.GET("/getPeriodCandles", ar.candleApiHandler.HandleGetPeriodCandles)
 	// apiRouterGroup.GET("/getLastCandles", ar.candleApiHandler.HandleGetLastCandles)

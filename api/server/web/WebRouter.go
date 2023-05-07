@@ -1,7 +1,7 @@
 package web
 
 import (
-	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/httphandler/web"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/http/handler/web"
 	"github.com/gin-gonic/gin"
 )
 

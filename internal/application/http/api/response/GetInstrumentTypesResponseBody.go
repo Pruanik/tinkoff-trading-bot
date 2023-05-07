@@ -1,4 +1,4 @@
-package item
+package response
 
 type GetInstrumentTypesResponseBody struct {
 	Code string

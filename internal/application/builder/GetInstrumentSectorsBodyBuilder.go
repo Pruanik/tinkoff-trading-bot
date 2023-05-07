@@ -1,7 +1,7 @@
 package builder
 
 import (
-	"github.com/Pruanik/tinkoff-trading-bot/internal/application/httpresponse/api/item"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/application/http/api/response"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/builder"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
 )
@@ -12,11 +12,11 @@ func NewGetInstrumentSectorsBodyBuilder() builder.GetInstrumentSectorsBodyBuilde
 
 type GetInstrumentSectorsBodyBuilder struct{}
 
-func (gisbb GetInstrumentSectorsBodyBuilder) CreateBody(instrumentSectors []model.InstrumentSector) []item.GetInstrumentSectorsResponseBody {
-	var body []item.GetInstrumentSectorsResponseBody
+func (gisbb GetInstrumentSectorsBodyBuilder) CreateBody(instrumentSectors []model.InstrumentSector) []response.GetInstrumentSectorsResponseBody {
+	var body []response.GetInstrumentSectorsResponseBody
 
 	for i := 0; i < len(instrumentSectors); i++ {
-		item := item.GetInstrumentSectorsResponseBody{
+		item := response.GetInstrumentSectorsResponseBody{
 			Id:   instrumentSectors[i].Id,
 			Code: instrumentSectors[i].Code,
 			Name: instrumentSectors[i].Name,

@@ -1,4 +1,4 @@
-package response
+package common
 
 const (
 	StatusSuccess = "success"

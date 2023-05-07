@@ -1,4 +1,4 @@
-package item
+package response
 
 type GetInstrumentSectorsResponseBody struct {
 	Id   int64

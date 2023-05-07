@@ -3,16 +3,21 @@ package api
 import (
 	"net/http"
 
+	"github.com/Pruanik/tinkoff-trading-bot/internal/application/http/api/request"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/builder"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/model"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/module/tinkoffinvestconnection/fillinghistoricaldata/candles"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/repository"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/service"
+	httpService "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/http/service"
 	"github.com/gin-gonic/gin"
 )
 
 func NewInstrumentApiHandler(
 	httpResponseBuilder builder.HttpResponseBuilderInterface,
+	httpService httpService.HttpServiceInterface,
 	instrumentRepository repository.InstrumentRepositoryInterface,
+	instrumentService service.InstrumentServiceInterface,
 	instrumentSectorRepository repository.InstrumentSectorRepositoryInterface,
 	instrumentSettingRepository repository.InstrumentSettingRepositoryInterface,
 	getInstrumentsBodyBuilder builder.GetInstrumentsBodyBuilderInterface,
@@ -23,7 +28,9 @@ func NewInstrumentApiHandler(
 ) *InstrumentApiHandler {
 	return &InstrumentApiHandler{
 		httpResponseBuilder:                 httpResponseBuilder,
+		httpService:                         httpService,
 		instrumentRepository:                instrumentRepository,
+		instrumentService:                   instrumentService,
 		instrumentSectorRepository:          instrumentSectorRepository,
 		instrumentSettingRepository:         instrumentSettingRepository,
 		getInstrumentsBodyBuilder:           getInstrumentsBodyBuilder,
@@ -36,7 +43,9 @@ func NewInstrumentApiHandler(
 
 type InstrumentApiHandler struct {
 	httpResponseBuilder                 builder.HttpResponseBuilderInterface
+	httpService                         httpService.HttpServiceInterface
 	instrumentRepository                repository.InstrumentRepositoryInterface
+	instrumentService                   service.InstrumentServiceInterface
 	instrumentSectorRepository          repository.InstrumentSectorRepositoryInterface
 	instrumentSettingRepository         repository.InstrumentSettingRepositoryInterface
 	getInstrumentsBodyBuilder           builder.GetInstrumentsBodyBuilderInterface
@@ -63,7 +72,7 @@ func (iah InstrumentApiHandler) HandleGetSectors(ctx *gin.Context) {
 }
 
 func (iah InstrumentApiHandler) HandleGetTypes(ctx *gin.Context) {
-	sectorId := iah.getQueryParams(ctx, "sectorId")
+	sectorId := iah.httpService.GetQueryParams(ctx, "sectorId")
 	var instrumentTypes []string
 	var err error
 
@@ -88,8 +97,8 @@ func (iah InstrumentApiHandler) HandleGetTypes(ctx *gin.Context) {
 }
 
 func (iah InstrumentApiHandler) HandleGetInstruments(ctx *gin.Context) {
-	sectorId := iah.getQueryParams(ctx, "sectorId")
-	typeName := iah.getQueryParams(ctx, "type")
+	sectorId := iah.httpService.GetQueryParams(ctx, "sectorId")
+	typeName := iah.httpService.GetQueryParams(ctx, "type")
 	var instruments []model.Instrument
 	var err error
 
@@ -117,48 +126,37 @@ func (iah InstrumentApiHandler) HandleGetInstruments(ctx *gin.Context) {
 	ctx.JSONP(http.StatusOK, iah.httpResponseBuilder.BuildSuccessResponse(responseBody))
 }
 
-func (iah InstrumentApiHandler) HandleGetCollectingInstruments(ctx *gin.Context) {
-	instrumentsSettings, err := iah.instrumentSettingRepository.GetInstrumentsSettingsWhereIsCollectingTrue(ctx)
-	if err != nil {
-		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(err.Error()))
+func (iah InstrumentApiHandler) HandleSetInstrumentObservable(ctx *gin.Context) {
+	var request request.PostSetInstrumentObservableRequestBody
+	ctx.BindJSON(&request)
+
+	if request.Figi == nil {
+		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse("Required paramentr 'figi' is absent"))
 		return
 	}
 
-	responseBody := iah.getCollectingInstrumentsBodyBuilder.CreateBody(instrumentsSettings)
-	if err != nil {
-		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(err.Error()))
+	error := iah.instrumentService.SetInstrumentObservable(ctx, *request.Figi)
+
+	if error != nil {
+		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(error.Error()))
 		return
 	}
 
-	ctx.JSONP(http.StatusOK, iah.httpResponseBuilder.BuildSuccessResponse(responseBody))
+	ctx.JSONP(http.StatusOK, iah.httpResponseBuilder.BuildSuccessResponse(request.Figi))
 }
 
-// func (iah InstrumentApiHandler) HandleSetCollectingInstrument(ctx *gin.Context) {
-// 	figi, status, err := iah.getSetCollectingInstrumentParams(ctx)
-
+// func (iah InstrumentApiHandler) HandleGetCollectingInstruments(ctx *gin.Context) {
+// 	instrumentsSettings, err := iah.instrumentSettingRepository.GetInstrumentsSettingsWhereIsCollectingTrue(ctx)
 // 	if err != nil {
 // 		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(err.Error()))
 // 		return
 // 	}
 
-// 	instrumentSetting := model.NewInstrumentSetting(*figi, *status)
-// 	_, saveError := iah.instrumentSettingRepository.Update(ctx, instrumentSetting)
-// 	if saveError != nil {
-// 		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(saveError.Error()))
+// 	responseBody := iah.getCollectingInstrumentsBodyBuilder.CreateBody(instrumentsSettings)
+// 	if err != nil {
+// 		ctx.JSONP(http.StatusBadRequest, iah.httpResponseBuilder.BuildErrorResponse(err.Error()))
 // 		return
 // 	}
-// 	iah.fillingHistoricalCandlesData.FillingHistoricalDataByFigi(ctx, *figi)
 
-// 	ctx.JSONP(http.StatusOK, iah.httpResponseBuilder.BuildSuccessResponse(nil))
+// 	ctx.JSONP(http.StatusOK, iah.httpResponseBuilder.BuildSuccessResponse(responseBody))
 // }
-
-func (iah InstrumentApiHandler) getQueryParams(ctx *gin.Context, paramKey string) *string {
-	paramValue, isParamExist := ctx.GetQuery(paramKey)
-
-	var result *string
-	if isParamExist {
-		result = &paramValue
-	}
-
-	return result
-}

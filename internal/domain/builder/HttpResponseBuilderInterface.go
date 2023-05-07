@@ -1,11 +1,11 @@
 package builder
 
 import (
-	"github.com/Pruanik/tinkoff-trading-bot/internal/application/httpresponse/api/response"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/application/http/common"
 )
 
 type HttpResponseBuilderInterface interface {
-	BuildErrorResponse(message string) response.Error
+	BuildErrorResponse(message string) common.Error
 
-	BuildSuccessResponse(body response.ResponseBody) response.Success
+	BuildSuccessResponse(body common.ResponseBody) common.Success
 }

@@ -1,7 +1,7 @@
 package builder
 
-import "github.com/Pruanik/tinkoff-trading-bot/internal/application/httpresponse/api/item"
+import "github.com/Pruanik/tinkoff-trading-bot/internal/application/http/api/response"
 
 type GetInstrumentTypesBodyBuilderInterface interface {
-	CreateBody(instrumentTypes []string) []item.GetInstrumentTypesResponseBody
+	CreateBody(instrumentTypes []string) []response.GetInstrumentTypesResponseBody
 }

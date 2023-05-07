@@ -3,7 +3,7 @@ package builder
 import (
 	"time"
 
-	"github.com/Pruanik/tinkoff-trading-bot/internal/application/httpresponse/api/response"
+	"github.com/Pruanik/tinkoff-trading-bot/internal/application/http/common"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/domain/builder"
 )
 
@@ -13,16 +13,16 @@ func NewHttpResponseBuilder() builder.HttpResponseBuilderInterface {
 
 type HttpResponseBuilder struct{}
 
-func (hrb HttpResponseBuilder) BuildErrorResponse(message string) response.Error {
-	responseStatus := response.Status{Status: response.StatusError, Message: message}
-	errorResponse := response.Error{Status: responseStatus, Time: time.Now()}
+func (hrb HttpResponseBuilder) BuildErrorResponse(message string) common.Error {
+	responseStatus := common.Status{Status: common.StatusError, Message: message}
+	errorResponse := common.Error{Status: responseStatus, Time: time.Now()}
 
 	return errorResponse
 }
 
-func (hrb HttpResponseBuilder) BuildSuccessResponse(body response.ResponseBody) response.Success {
-	responseStatus := response.Status{Status: response.StatusSuccess, Message: ""}
-	successResponse := response.Success{Status: responseStatus, Body: body, Time: time.Now()}
+func (hrb HttpResponseBuilder) BuildSuccessResponse(body common.ResponseBody) common.Success {
+	responseStatus := common.Status{Status: common.StatusSuccess, Message: ""}
+	successResponse := common.Success{Status: responseStatus, Body: body, Time: time.Now()}
 
 	return successResponse
 }

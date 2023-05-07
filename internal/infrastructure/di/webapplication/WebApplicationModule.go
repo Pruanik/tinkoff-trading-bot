@@ -14,8 +14,9 @@ import (
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/di/common"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/grpc"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/grpc/investapi"
-	apiHandler "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/httphandler/api"
-	webHandler "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/httphandler/web"
+	apiHandler "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/http/handler/api"
+	webHandler "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/http/handler/web"
+	httpService "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/http/service"
 	log "github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/logger"
 	"github.com/Pruanik/tinkoff-trading-bot/internal/infrastructure/tinkoffinvest"
 	"go.uber.org/fx"
@@ -37,6 +38,7 @@ func (wam WebApplicationModule) BuildOptions(config *configs.Config) fx.Option {
 			apiHandler.NewInstrumentApiHandler,
 			apiHandler.NewSystemApiHandler,
 			apiHandler.NewCandleApiHandler,
+			httpService.NewHttpService,
 			builder.NewHttpResponseBuilder,
 			builder.NewGetInstrumentsBodyBuilder,
 			builder.NewGetInstrumentSectorsBodyBuilder,
